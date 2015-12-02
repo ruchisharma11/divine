@@ -1,0 +1,88 @@
+<div style="overflow: auto; width:400px; height:400px; " class="ngdialog-message" ng-controller="EditLooksController">
+    <h3>Edit Looks</h3>
+
+    <form method="post" validate-form="" novalidate="" ng-submit="EditLooks(updateVal)" id="add-looks">
+        <div class="panel panel-default">
+
+            <div ng-show="successMsg" class="alert alert-success text-center">{{successMsg}}</div>
+            <div ng-show="errorMsg" class="alert alert-danger text-center">{{errorMsg}}</div>
+            <div class="panel-body">
+                <!--<div class="form-group">-->
+                    <!--{{updateVal}}-->
+                    <!--<label class="control-label">Service Name</label>-->
+                    <!--<select name="type" class="form-control" ng-model="service_id" required="required">-->
+                        <!--<option ng-repeat="option in options" ng-value="option.value"-->
+                                <!--ng-selected="option.value == updateVal">{{option.name}}-->
+                        <!--</option>-->
+                    <!--</select>-->
+                <!--</div>-->
+                <!--<div class="form-group">-->
+                    <!--<label class="control-label">Service Name</label>-->
+                    <!--<input type="text" name="team_name" required="required" class="form-control"-->
+                           <!--ng-model="editLooks.service_name"/>-->
+                <!--</div>-->
+                <div class="form-group">
+                    <label class="control-label">Look Type</label>
+                    <input type="text" name="team_name" required="required" class="form-control"
+                           ng-model="editLooks.look_name"/>
+                </div>
+                <!--<div class="form-group">-->
+                    <!--<label class="control-label">Cost(&#163;)</label>-->
+                    <!--<input type="text" name="team_name" required="required" class="form-control"-->
+                           <!--ng-model="editLooks.price" data-parsley-type="number"/>-->
+                <!--</div>-->
+                <!--<div class="form-group">-->
+                    <!--<label class="control-label">Time(min)</label>-->
+                    <!--<input type="text" name="team_name" required="required" class="form-control"-->
+                           <!--ng-model="editLooks.serviceduration" data-parsley-type="number"/>-->
+                <!--</div>-->
+                <div>
+                    <label>Upload Image for Android (800x800)</label>
+
+                    <div>
+                        <img style="width:100px;height:100px"
+                             class="form-control"
+                              id="androidimg" ng-src="{{editLooks.image_android}}">
+                    </div>
+                    <div style="clear:both"></div>
+                    <div>
+                        <span>Upload Android Image (800x800)</span>
+                        <!--<input type="file" accept="image/*" >-->
+                        <input  filestyle="" type="file" accept="image/*"
+                                onchange="angular.element(this).scope().file_to_upload(this.files,0)"
+                                data-button-text="Single" data-class-button="btn btn-default"
+                                data-classinput="form-control inline" nv-file-select="" uploader="uploader"
+                                class="form-control upload"/>
+
+                    </div>
+                    <label>Upload Image for iOS (1242*1390) </label>
+
+                    <div>
+                        <img style="width:100px;height:100px"
+                             class="form-control"
+                              id="iosimg" ng-src="{{editLooks.image}}">
+                    </div>
+                    <div style="clear:both"></div>
+                    <div>
+                        <span>Upload iOSImage (1242*1390)</span>
+                        <!--<input type="file" accept="image/*" >-->
+                        <input  filestyle="" type="file" accept="image/*"
+                                onchange="angular.element(this).scope().file_to_upload(this.files,1)"
+                                data-button-text="Single" data-class-button="btn btn-default"
+                                data-classinput="form-control inline" nv-file-select="" uploader="uploader"
+                                class="form-control upload"/>
+
+                    </div>
+                </div>
+
+
+                <input type="hidden" ng-model="editLooks.id_pop">
+            </div>
+            <div class="panel-footer">
+                <button type="submit" class="btn btn-info">Submit</button>
+                <button type="button" ng-click="closeThisDialog(0)" class="btn btn-default">Cancel
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

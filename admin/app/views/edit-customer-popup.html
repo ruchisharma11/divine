@@ -1,0 +1,46 @@
+<div class="ngdialog-message" ng-controller="EditCustomerController">
+    <h3 style="color: black">Edit Customer</h3>
+
+    <form method="post" validate-form="" novalidate="" ng-submit="EditService(editCustomer)" id="add-service">
+        <div class="panel panel-default">
+
+            <div ng-show="successMsg" class="alert alert-success text-center">{{successMsg}}</div>
+            <div ng-show="errorMsg" class="alert alert-danger text-center">{{errorMsg}}</div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="control-label">First name</label>
+                    <input type="text" name="team_name" required="required" class="form-control"
+                           ng-model="editCustomer.firstName"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Last name</label>
+                    <input type="text" name="team_name" required="required" class="form-control"
+                           ng-model="editCustomer.lastName"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Phone no.</label>
+                    <input type="text" name="team_name" required="required" class="form-control"
+                           ng-model="editCustomer.phoneNumber" data-parsley-type="number"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Email id</label>
+                    <input type="text" name="team_name" required="required" class="form-control"
+                           ng-model="editCustomer.email"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Registration Date</label>
+                    <input type="text" name="team_name" required="required" class="form-control"
+                           ng-model="editCustomer.registrationDate"/>
+                </div>
+
+
+                <input type="hidden" ng-model="editCustomer.id_pop" />
+            </div>
+            <div class="panel-footer">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" ng-click="closeThisDialog(0)" class="btn btn-default">Cancel
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

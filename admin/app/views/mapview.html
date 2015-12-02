@@ -1,0 +1,14 @@
+<h3>
+    Google Map
+    <small>Displaying drivers location of Google map.</small>
+</h3>
+<div ng-controller="MapController">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">Multiple Addresses</div>
+            <div class="panel-body" ng-class="{'whirl standard' : mapLoading }">
+                <div gmap="" map-address="mapAddress" class="gmap"></div>
+            </div>
+        </div>
+    </div>
+</div>

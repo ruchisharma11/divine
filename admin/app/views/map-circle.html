@@ -1,0 +1,46 @@
+<h3>
+    Google Map
+    <small>Displaying drivers location of Google map.</small>
+</h3>
+<div ng-controller="MapCircleController">
+
+    <div class="col-md-12 row">
+        <div class="col-md-6">
+            <div ng-repeat="circle in circles">
+                <span>
+                    <p class="inline-block">Circle {{circle.id}} radius: {{circle.radius | number:2}} and Center:
+                        {{circle.center.latitude|number:2}},{{circle.center.longitude|number:2}}  &nbsp;</p>
+
+                    <a class="fa fa-trash-o icon-css inline-block" ng-click="deleteCircle(circle.id)"></a>
+                </span>
+            </div>
+            <input type="text" ng-model="latitude" placeholder="Latitude">
+            <input type="text" ng-model="longitude" placeholder="Longitude">
+            <button type="button" class="mb-sm btn btn-default" ng-click="addCircle()">Add Circle</button>
+        </div>
+        <div class="col-md-6">
+            <ui-gmap-google-map center='map.center'
+                                zoom='map.zoom'
+                                draggable='map.draggable'
+                                dragging='map.dragging'
+                                refresh='map.refresh'
+                                options='map.options'
+                                events='map.events'
+                                pan='map.pan'>
+
+                <ui-gmap-circle ng-repeat="c in circles track by c.id"
+                                center='c.center'
+                                radius='c.radius'
+                                fill='c.fill'
+                                stroke='c.stroke'
+                                clickable='c.clickable'
+                                draggable='c.draggable'
+                                editable='c.editable'
+                                visible='c.visible'
+                                events='c.events'>
+                </ui-gmap-circle>
+
+            </ui-gmap-google-map>
+        </div>
+    </div>
+</div>

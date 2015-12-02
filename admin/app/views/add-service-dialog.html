@@ -1,0 +1,49 @@
+<div class="ngdialog-message" ng-controller="AddServiceController">
+    <h3>Add Service</h3>
+
+    <form method="post" validate-form="" novalidate="" ng-submit="AddService()" id="add-service">
+        <div class="panel panel-default">
+
+            <div ng-show="successMsg" class="alert alert-success text-center">{{successMsg}}</div>
+            <div ng-show="errorMsg" class="alert alert-danger text-center">{{errorMsg}}</div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="control-label">Category</label>
+                    <select class="form-control m-bot15"
+                            placeholder="choose"
+                            style="width:100%;"
+                            ng-init="cat = options[0]"
+                            ng-model="addService.category" value="addService.category"
+                            ng-options="option.name for option in options">
+                    </select>
+                </div>
+                <!--{{addService.category}}-->
+                <div class="form-group">
+                    <label class="control-label">Service Name</label>
+                    <input type="text" name="team_name" required="required" class="form-control"
+                           ng-model="addService.servicename"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Cost(&#163;)</label>
+                    <input type="text" name="team_name" required="required" class="form-control"
+                           ng-model="addService.cost" data-parsley-type="number"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Time(min)</label>
+                    <input type="text" name="team_name" required="required" class="form-control"
+                           ng-model="addService.servicetime" data-parsley-type="number"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Description</label>
+                    <textarea type="text" name="team_name" required="required" class="form-control"
+                              ng-model="addService.description"></textarea>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <button type="submit" class="btn btn-info">Submit</button>
+                <button type="button" ng-click="closeThisDialog(0)" class="btn btn-default">Cancel
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

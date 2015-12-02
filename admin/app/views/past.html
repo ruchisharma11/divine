@@ -1,0 +1,129 @@
+
+<span ng-controller="PastSessionController">
+<h3>Past Sessions
+    <small>Get all past sessions list</small>
+</h3>
+<div class="container-fluid">
+
+    <!-- START DATATABLE 2 -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="table-responsive">
+                    <table id="datatable2" class="table table-striped table-hover"
+                           ng-class="{'whirl standard' : loading }">
+                        <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th>Order_id</th>
+                            <th>Service Type</th>
+                            <th>Current Type</th>
+                            <th>Job Status</th>
+                            <th>Payment status</th>
+                            <th >Order Created Time</th>
+                            <th>Pickup Location Coordinates</th>
+                            <th>Pickup Location Coordinates</th>
+
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="data in list">
+
+                            <td>{{$index + 1}}</td>
+                            <td>{{data.orderId}}</td>
+                            <td>{{data. serviceType}}</td>
+                            <td>{{data.currentType}}</td>
+                            <td>{{data.jobStatus}}</td>
+                            <td>{{data.payment}}</td>
+                            <td>{{data.orderCreatedTime}}</td>
+                            <td >{{data.Lat}} </td>
+                            <td >{{data.Lng}} </td>
+                            <!--  <td>{{data.fullName}}</td>
+
+                              <!--td>{{data.customer_name}}</td-->
+                            <!--td>{{data.artist_name}}</td-->
+                            <!--td ng-switch="data.status"
+                                <span ng-switch-when="2" class="label label-primary">Out to Serve</span>
+                                <span ng-switch-when="3" class="label label-purple">Reached</span>
+                                <span ng-switch-when="4" class="label label-pink">Started</span>
+                            </td>
+                            <td>
+
+                                <button ng-click="cancelSession(data.id)" title="Cancel"
+                                        class="btn btn-sm btn-danger pull-ext">
+                                    <em class="fa fa-trash-o"></em>
+                                </button>
+
+                            </td>-->
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <th>
+                                <input type="text" name="filter_index" placeholder="#"
+                                       class="form-control input-sm datatable_input_col_search"/>
+                            </th>
+                            <th>
+                                <input type="text" name="filter_mal_price" placeholder="order id"
+                                       class="form-control input-sm datatable_input_col_search"/>
+                            </th>
+                            <th>
+                                <input type="text" name="filter_meal_image" placeholder="service type"
+                                       class="form-control input-sm datatable_input_col_search"/>
+                            </th>
+                            <th>
+                                <input type="text" name="filter_meal_description" placeholder="current type)"
+                                       class="form-control input-sm datatable_input_col_search"/>
+                            </th>
+                            <th>
+                                <input type="text" name="filter_meal_image" placeholder="job status"
+                                       class="form-control input-sm datatable_input_col_search"/>
+                            </th>
+                            <th>
+                                <input type="text" name="filter_meal_image" placeholder="payment status"
+                                       class="form-control input-sm datatable_input_col_search"/>
+                            </th>
+
+                            <th>
+                                <input type="text" name="filter_meal_name" placeholder="order created time"
+                                       class="form-control input-sm datatable_input_col_search"/>
+                            </th>
+                            <th>
+                                <input type="text" name="filter_meal_name" placeholder="pick up location coordinates"
+                                       class="form-control input-sm datatable_input_col_search"/>
+                            </th>
+                            <th>
+                                <input type="text" name="filter_meal_name" placeholder="pick up location coordinates"
+                                       class="form-control input-sm datatable_input_col_search"/>
+                            </th>
+
+                            <!--th>
+                                <input type="text" name="filter_index" placeholder="Customer Name"
+                                       class="form-control input-sm datatable_input_col_search"/>
+                            </th-->
+                            <!--th>
+                                <input type="text" name="filter_meal_name" placeholder="Artist Name"
+                                       class="form-control input-sm datatable_input_col_search"/>
+                            </th-->
+                            <!--th>
+                                <input type="text" name="filter_mal_price" placeholder="Status"
+                                       class="form-control input-sm datatable_input_col_search"/>
+                            </th-->
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <!-- END DATATABLE 2 -->
+
+<!--/div>
+    </span>
+<span ng-controller="map1">
+<div classs="Map" style="height: 100px;width: 100px;"></div>
+    </span-->
+    <map></map>

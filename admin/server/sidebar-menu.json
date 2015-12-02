@@ -1,0 +1,50 @@
+[
+  {
+    "text": "Menu Heading",
+    "heading": "true"
+  },
+  {
+    "text": "Dashboard",
+    "sref": "app.dashboard-new",
+    "icon": "icon-speedometer"
+
+  },
+  {
+    "text": "Customers",
+    "sref": "app.customers",
+    "icon": "icon-emoticon-smile"
+  },
+  {
+    "text": "Drivers",
+    "sref": "#",
+    "icon": "icon-user-following",
+    "submenu": [
+
+      {
+        "text": "Verified",
+        "sref": "app.verified-artist"
+      }
+    ]
+  },
+
+  {
+    "text": "Bookings",
+    "sref": "#",
+    "icon": "icon-calendar",
+    "submenu": [
+
+      {
+        "text": "In Progress",
+        "sref": "app.ongoing"
+      },
+
+      {
+        "text": "Past",
+        "sref": "app.past"
+      }
+
+    ]
+  }
+
+
+]
