@@ -328,6 +328,11 @@ App.controller('SidebarController', ['$rootScope', '$scope', '$state', '$http', 
 
         $scope.loadSidebarMenu = function () {
 
+            if($rootScope.menuItems && $rootScope.menuItems.length!=0)
+            {
+                return;
+            }
+
             var menuJson = 'server/sidebar-menu.json',
                 menuURL = menuJson + '?v=' + (new Date().getTime()); // jumps cache
             $http.get(menuURL)

@@ -6,25 +6,33 @@ App.controller('LoginController', function ($scope, $http, $cookies, $cookieStor
 
     $scope.loginAdmin = function () {
         $scope.authMsg = '';
-        $.post(MY_CONSTANT.url + '/api/admin/logIn',
-            {
+
+        $http
+        ({
+            url: MY_CONSTANT.url + '/api/admin/logIn',
+            method: "POST",
+            data: {
                 "password": $scope.account.password,
-                "email": $scope.account.email,
-
-            }).then(
-            function (data) {
-
-                if (data.error) {
-                    $scope.authMsg = data.error;
-                    $scope.$apply();
-                } else {
-
-                    $cookieStore.put('obj',data.data.accessToken);
-                    $cookieStore.put('obj1',data.data.adminId);
-                    $state.go('app.dashboard-new');
-                }
-            });
+                "email": $scope.account.email
+            }
+        }).success(function (response) {
+            var someSessionObj = response.data.accessToken;
+            console.log(response);
+            $cookieStore.put('obj',response.data.accessToken);
+           $cookieStore.put('obj1',response.data.adminId);
+            console.log('accessToken:', someSessionObj);
+            $state.go('app.dashboard-new');
+        }).error(function (data) {
+            {
+                console.log(data);
+                $scope.loading = false;
+                $scope.authMsg = response.data.details.message;
+            }
+        });
     };
+
+
+
 
     $scope.recover = function () {
 

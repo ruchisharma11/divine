@@ -1,6 +1,4 @@
-<!--<h3>Dashboard-->
-    <!--<small>Dashboard information</small>-->
-<!--</h3>-->
+
 <span ng-controller="DashboardController">
 
     <div class="row">
@@ -13,8 +11,8 @@
                             <em class="fa fa-line-chart fa-5x"></em>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div class="text-lg">&#163;{{current.totalrevenue || 0}}</div>
-                            <p class="m0">Total Revenue</p>
+                            <div class="text-lg">&#163;{{current.bookings || 0}}</div>
+                            <p class="m0">Total Bookings</p>
                         </div>
                     </div>
                 </div>
@@ -27,11 +25,11 @@
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <em class="fa fa-shopping-cart fa-5x"></em>
+                            <em class="fa fa-line-chartfa-5x"></em>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div class="text-lg">{{current.servicescompleted || 0}}</div>
-                            <p class="m0">Service Completed</p>
+                            <div class="text-lg">{{current.customers || 0}}</div>
+                            <p class="m0">No. Of Customers</p>
                         </div>
                     </div>
                 </div>
@@ -47,8 +45,8 @@
                             <em class="fa fa-tasks fa-5x"></em>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div class="text-lg">{{current.servicesscheduled || 0}}</div>
-                            <p class="m0">Service Scheduled</p>
+                            <div class="text-lg">{{current.drivers || 0}}</div>
+                            <p class="m0">No. Of Drivers</p>
                         </div>
                     </div>
                 </div>
@@ -77,119 +75,119 @@
         </div>
     </div>
 
- <!-- Row 2 -->
-    <div class="row">
-        <div class="col-lg-4">
-            <!-- START List group-->
-            <ul class="list-group">
-                <li class="list-group-item">
-                    <div class="row row-table pv-lg">
-                        <div class="col-xs-6">
-                            <p class="m0 lead">&#163;{{gross.totalrevenue || 0}}</p>
+ <!--&lt;!&ndash; Row 2 &ndash;&gt;-->
+    <!--<div class="row">-->
+        <!--<div class="col-lg-4">-->
+            <!--&lt;!&ndash; START List group&ndash;&gt;-->
+            <!--<ul class="list-group">-->
+                <!--<li class="list-group-item">-->
+                    <!--<div class="row row-table pv-lg">-->
+                        <!--<div class="col-xs-6">-->
+                            <!--<p class="m0 lead">&#163;{{gross.totalrevenue || 0}}</p>-->
 
-                            <p class="m0">
-                                <small>Gross Total Revenue</small>
-                            </p>
-                        </div>
-                        <div class="col-xs-6 text-center">
-                        </div>
-                    </div>
-                </li>
-                <li class="list-group-item">
-                    <div class="row row-table pv-lg">
-                        <div class="col-xs-6">
-                            <p class="m0 lead">{{gross.servicescompleted || 0}}</p>
+                            <!--<p class="m0">-->
+                                <!--<small>Gross Total Revenue</small>-->
+                            <!--</p>-->
+                        <!--</div>-->
+                        <!--<div class="col-xs-6 text-center">-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</li>-->
+                <!--<li class="list-group-item">-->
+                    <!--<div class="row row-table pv-lg">-->
+                        <!--<div class="col-xs-6">-->
+                            <!--<p class="m0 lead">{{gross.servicescompleted || 0}}</p>-->
 
-                            <p class="m0">
-                                <small>Gross Services Completed</small>
-                            </p>
-                        </div>
-                        <div class="col-xs-6 text-center">
-                        </div>
-                    </div>
-                </li>
-                <li class="list-group-item">
-                    <div class="row row-table pv-lg">
-                        <div class="col-xs-6">
-                            <p class="m0 lead">{{gross.servicesscheduled || 0}}</p>
+                            <!--<p class="m0">-->
+                                <!--<small>Gross Services Completed</small>-->
+                            <!--</p>-->
+                        <!--</div>-->
+                        <!--<div class="col-xs-6 text-center">-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</li>-->
+                <!--<li class="list-group-item">-->
+                    <!--<div class="row row-table pv-lg">-->
+                        <!--<div class="col-xs-6">-->
+                            <!--<p class="m0 lead">{{gross.servicesscheduled || 0}}</p>-->
 
-                            <p class="m0">
-                                <small>Gross Services Scheduled</small>
-                            </p>
-                        </div>
-                        <div class="col-xs-6">
-                        </div>
-                    </div>
-                </li>
-            </ul>
-            <!-- END List group-->
+                            <!--<p class="m0">-->
+                                <!--<small>Gross Services Scheduled</small>-->
+                            <!--</p>-->
+                        <!--</div>-->
+                        <!--<div class="col-xs-6">-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</li>-->
+            <!--</ul>-->
+            <!--&lt;!&ndash; END List group&ndash;&gt;-->
 
-            <!-- START widget-->
-            <div class="panel widget">
-                <div class="row row-table row-flush">
-                    <div class="col-xs-12 bb br">
-                        <div class="row row-table row-flush">
-                            <div class="col-xs-4 text-center text-info text-widget-box">
-                                <em class="fa fa-users fa-2x"></em>
-                            </div>
-                            <div class="col-xs-8">
-                                <div class="panel-body text-center">
-                                    <h4 class="mt0">{{registered.users || 0}}</h4>
+            <!--&lt;!&ndash; START widget&ndash;&gt;-->
+            <!--<div class="panel widget">-->
+                <!--<div class="row row-table row-flush">-->
+                    <!--<div class="col-xs-12 bb br">-->
+                        <!--<div class="row row-table row-flush">-->
+                            <!--<div class="col-xs-4 text-center text-info text-widget-box">-->
+                                <!--<em class="fa fa-users fa-2x"></em>-->
+                            <!--</div>-->
+                            <!--<div class="col-xs-8">-->
+                                <!--<div class="panel-body text-center">-->
+                                    <!--<h4 class="mt0">{{registered.users || 0}}</h4>-->
 
-                                    <p class="mb0 text-muted">TOTAL USERS</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row row-table row-flush">
-                    <div class="col-xs-12 br">
-                        <div class="row row-table row-flush">
-                            <div class="col-xs-4 text-center text-inverse">
-                                <em class="fa fa-code-fork fa-2x"></em>
-                            </div>
-                            <div class="col-xs-8">
-                                <div class="panel-body text-center">
-                                    <h4 class="mt0">{{registered.sp || 0}}</h4>
+                                    <!--<p class="mb0 text-muted">TOTAL USERS</p>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="row row-table row-flush">-->
+                    <!--<div class="col-xs-12 br">-->
+                        <!--<div class="row row-table row-flush">-->
+                            <!--<div class="col-xs-4 text-center text-inverse">-->
+                                <!--<em class="fa fa-code-fork fa-2x"></em>-->
+                            <!--</div>-->
+                            <!--<div class="col-xs-8">-->
+                                <!--<div class="panel-body text-center">-->
+                                    <!--<h4 class="mt0">{{registered.sp || 0}}</h4>-->
 
-                                    <p class="mb0 text-muted">TOTAL ARTISTS</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- END widget-->
-        </div>
+                                    <!--<p class="mb0 text-muted">TOTAL ARTISTS</p>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--&lt;!&ndash; END widget&ndash;&gt;-->
+        <!--</div>-->
 
-        <div class="col-lg-8">
-            <!-- START bar chart-->
-            <div id="panelChart4" class="panel panel-default" ng-controller="FlotChartController">
-                <div class="panel-heading">
-                    <paneltool tool-collapse="tool-collapse" tool-dismiss="tool-dismiss"></paneltool>
-                    <div class="panel-title">Revenue Growth</div>
-                </div>
-                <div collapse="panelChart4" class="panel-wrapper">
-                    <div class="panel-body">
-                        <flot dataset="lineData" options="lineOptions" height="215px"></flot>
-                    </div>
-                </div>
-            </div>
-            <!-- END bar chart-->
+        <!--<div class="col-lg-8">-->
+            <!--&lt;!&ndash; START bar chart&ndash;&gt;-->
+            <!--<div id="panelChart4" class="panel panel-default" ng-controller="FlotChartController">-->
+                <!--<div class="panel-heading">-->
+                    <!--<paneltool tool-collapse="tool-collapse" tool-dismiss="tool-dismiss"></paneltool>-->
+                    <!--<div class="panel-title">Revenue Growth</div>-->
+                <!--</div>-->
+                <!--<div collapse="panelChart4" class="panel-wrapper">-->
+                    <!--<div class="panel-body">-->
+                        <!--<flot dataset="lineData" options="lineOptions" height="215px"></flot>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--&lt;!&ndash; END bar chart&ndash;&gt;-->
 
-            <!-- START bar chart-->
-            <div id="panelChart4" class="panel panel-default" ng-controller="FlotChartController">
-                <div class="panel-heading">
-                    <paneltool tool-collapse="tool-collapse" tool-dismiss="tool-dismiss"></paneltool>
-                    <div class="panel-title">Booking Growth</div>
-                </div>
-                <div collapse="panelChart4" class="panel-wrapper">
-                    <div class="panel-body">
-                        <flot dataset="lineData2" options="lineOptions" height="215px"></flot>
-                    </div>
-                </div>
-            </div>
-            <!-- END bar chart-->
-        </div>
-    </div>
+            <!--&lt;!&ndash; START bar chart&ndash;&gt;-->
+            <!--<div id="panelChart4" class="panel panel-default" ng-controller="FlotChartController">-->
+                <!--<div class="panel-heading">-->
+                    <!--<paneltool tool-collapse="tool-collapse" tool-dismiss="tool-dismiss"></paneltool>-->
+                    <!--<div class="panel-title">Booking Growth</div>-->
+                <!--</div>-->
+                <!--<div collapse="panelChart4" class="panel-wrapper">-->
+                    <!--<div class="panel-body">-->
+                        <!--<flot dataset="lineData2" options="lineOptions" height="215px"></flot>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--&lt;!&ndash; END bar chart&ndash;&gt;-->
+        <!--</div>-->
+    <!--</div>-->
 </span>

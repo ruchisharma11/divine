@@ -20,21 +20,19 @@
                             <th>Job Status</th>
                             <th>Payment status</th>
                             <th >Order Created Time</th>
-                            <th>Pickup Location Coordinates</th>
-                            <th>Pickup Location Coordinates</th>
+
                         </tr>
                         </thead>
                         <tbody>
                         <tr ng-repeat="data in list">
-                            <td>{{$index + 1}}</td>
+                            <td STYLE="width: 50PX;" !IMPORTANT>{{$index + 1}}</td>
                             <td>{{data.orderId}}</td>
                             <td>{{data. serviceType}}</td>
                             <td>{{data.currentType}}</td>
                             <td>{{data.jobStatus}}</td>
                             <td>{{data.payment}}</td>
                             <td>{{data.orderCreatedTime}}</td>
-                            <td >{{data.Lat}} </td>
-                            <td >{{data.Lng}} </td>
+
                             <td ng-switch="data.status">
                                 <span ng-switch-when="0" class="label label-info">Booked</span>
                                 <span ng-switch-when="1" class="label label-success">Confirmed</span>

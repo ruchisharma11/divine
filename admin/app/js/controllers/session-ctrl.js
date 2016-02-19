@@ -1,23 +1,83 @@
-App.controller('OngoingSessionController', function ($scope, $http, $location, $cookies, $cookieStore, MY_CONSTANT, $timeout, $window, ngDialog, getCategories) {
+App.controller('OngoingSessionController', function ($scope, $http, $location, $cookies, $cookieStore, MY_CONSTANT, $timeout, $window, ngDialog) {
     'use strict';
     $scope.loading = true;
+    $scope.pageLoaded = false;
+    $scope.searchPaging = false;
+    $scope.total_pages;
+    $scope.last_page;
+    $scope.page_no = 1;
+    $scope.total_records;
 
-    var getServiceList = function () {
-        var accessToken=$cookieStore.get('obj');
-        console.log(accessToken);
-        var  adminId= $cookieStore.get('obj1');
-        console.log(adminId);
-        $.get(MY_CONSTANT.url + '/api/admin/showBookings/'+adminId+'/'+accessToken+'/'+0+'/'+0+'/VALET',
+    $scope.options = [10,25,50,100];
+    $scope.page_length = $scope.options[0];
 
+    var start, end, searchArray;
+    var completeList = [];
 
-        //access_token: $cookieStore.get('obj').accesstoken
+    var putData = function(column, dataArray, index) {
+        var d = {
+            index : "",
+            orderId: "",
+            serviceType: "",
+            currentType: "",
+            jobStatus: "",
+            payment: "",
+            orderCreatedTime: "",
 
-         function (data) {
-             console.log(data);
+            pickuplocationname: ""
+            //dropsoffspid:"",
+            //Lat: "",
+            //Lng: "",
+            // fullName: "",
+        };
+        d.index = index;
+        d.orderId = column.orderId;
+        d.serviceType = column.serviceType;
+        d.currentType = column.currentType;
+
+        if(column.orderStatus=="SPRESPONDED")
+            d.jobStatus="SP RESPONDED";
+        else if (column.orderStatus=="SPRESPONDEDDELIVERY")
+            d.jobStatus="SP RESPONDED DELIVERY";
+        else if (column.orderStatus=="SPARRIVED")
+            d.jobStatus="SP ARRIVED";
+        else if (column.orderStatus=="SPPICKUPCAR")
+            d.jobStatus="SP PICKUP CAR";
+        else if (column.orderStatus=="EXTRASERVICES")
+            d.jobStatus="EXTRA SERVICES";
+        else if (column.orderStatus=="PAYMENTDUE")
+            d.jobStatus="PAYMENT DUE";
+        else if (column.orderStatus=="STARTSERVICE")
+            d.jobStatus="START SERVICE";
+        else d.jobStatus = column.orderStatus?column.orderStatus:'';
+
+        d.payment = column.paymentDetails.status;
+        d.orderCreatedTime = column.orderCreatedTime.split("T")[0];
+        d.pickUpLocationName = column.pickUpLocationName;
+        dataArray.push(d);
+
+    };
+
+    var createPageArray = function(start, end) {
+        var page_arr = [];
+        start = start<2?2:start;
+        end = end>$scope.total_pages-1?$scope.total_pages-1:end;
+        for(var i=start;i<=end;i++) {
+            page_arr.push(i);
+        }
+        $scope.pages = page_arr;
+    };
+    $scope.getCustomerList=function (page_number) {
+        $scope.last_page = $scope.page_no;
+        $scope.page_no = page_number;
+        $scope.limit=$scope.page_length;
+        $scope.skip = $scope.limit * ($scope.page_no-1);
+        //$scope.skip = $scope.page_no == $scope.total_pages?$scope.total_records-1:$scope.skip;
+        var index = (page_number - 1) * $scope.page_length;
+        $.get(MY_CONSTANT.url + '/api/admin/showBookings/'+$cookieStore.get('obj1')+'/'+$cookieStore.get('obj')+'/'+$scope.skip+'/'+$scope.limit+'/VALET?isInProgress=true', function (data) {
             var dataArray = [];
-            console.log(data);
+            $scope.total_records = data.data.bookingsCount;
             if (data.error) {
-                console.log(data);
                 ngDialog.open({
                     template: '<p>Something went wrong !</p>',
                     className: 'ngdialog-theme-default',
@@ -28,91 +88,95 @@ App.controller('OngoingSessionController', function ($scope, $http, $location, $
                 });
                 return false;
             }
+            $scope.total_pages = Math.ceil(data.data.bookingsCount/$scope.page_length);
             data.data.bookingDetails.forEach(function (column) {
-                var d = {
-                    orderid: "",
-                    servicetype: "",
-                    currenttype: "",
-                    jobstatus: "",
-                    payment:"",
-                    ordercreatedtime:"",
-                    pickuplocationname:"",
-                    dropsoffspid:"",
-                    Lat: "",
-                    Lng:"",
-                    fullName: "",
-                   // pikupspid: "",
-                   // serviceStartTime:''
-                };
-                //var book_date = column.booking_date.toString().split("T"[0]);
-            //    var date = column.service_date.toString().split("T")[0];
-               // var date='';
-              //  var startTimeHours = column.start_time.split(":")[0];
-               /// var startTimeMinutes = column.start_time.split(":")[1];
-               // var suffix = startTimeHours >= 12 ? "PM" : "AM",
-                //    hours12 = startTimeHours % 12;
-               // var displayTime = hours12 + ":" + startTimeMinutes + " " + suffix;
-
-{ d.orderId = column.orderId;
-                d.serviceType = column.serviceType;
-                d.currentType= column.currentType;
-                d.jobStatus = column.jobStatus;
-                 d.payment = column.paymentDetails[1];
-                 d.orderCreatedTime = column.orderCreatedTime;
-    markr.Lat=column.Lat;
-    markr.Lng=column.Lng;
-    dataArray.push(d);
-    markersCoords.push(markr);
-}
+                putData(column, dataArray, ++index);
 
             });
+            $scope.loading=false;
 
-             console.log(dataArray);
-             console.log(markersCoords);
-             $scope.$apply(function () {
-                 $scope.list = dataArray;
-                 // console.log($scope.list);
-                 // Define global instance we'll use to destroy later
-                 var dtInstance;
-                 $scope.loading = false;
-                 $timeout(function () {
-                     if (!$.fn.dataTable)
-                         return;
-                     dtInstance = $('#datatable2').dataTable({
-                         'paging': true, // Table pagination
-                         'ordering': true, // Column ordering
-                         'info': true, // Bottom left status text
-                         'bDestroy': true,
-                         // Text translation options
-                         // Note the required keywords between underscores (e.g _MENU_)
-                         oLanguage: {
-                             sSearch: 'Search all columns:',
-                             sLengthMenu: '_MENU_ records per page',
-                             info: 'Showing page _PAGE_ of _PAGES_',
-                             zeroRecords: 'Nothing found - sorry',
-                             infoEmpty: 'No records available',
-                             infoFiltered: '(filtered from _MAX_ total records)'
-                         }
-                     });
-                     var inputSearchClass = 'datatable_input_col_search';
-                     var columnInputs = $('tfoot .' + inputSearchClass);
-
-                     // On input keyup trigger filtering
-                     columnInputs
-                         .keyup(function () {
-                             dtInstance.fnFilter(this.value, columnInputs.index(this));
-                         });
-                 });
-                 $scope.$on('$destroy', function () {
-                     dtInstance.fnDestroy();
-                     $('[class*=ColVis]').remove();
-                 });
-             });
-
-         });
+            $scope.$apply(function () {
+                $scope.list = dataArray;
+                $scope.loading = false;
+                if($scope.total_pages>7) {
+                    if($scope.page_no == 1) {
+                        start = 2;
+                        end = $scope.total_pages>6?5:$scope.total_pages;
+                    }
+                    else {
+                        if($scope.page_no!=$scope.last_page) {
+                            if($scope.last_page < $scope.page_no) {
+                                start = $scope.page_no - 1;
+                                end = $scope.page_no + 2;
+                            }
+                            else {
+                                start = $scope.page_no - 2;
+                                end = $scope.page_no +1;
+                            }
+                        }
+                    }
+                }
+                else {
+                    start = 2;
+                    end = $scope.total_pages;
+                }
+                createPageArray(start, end);
+                $scope.searchPaging = false;
+                $scope.pageLoaded = true;
+            });
+        });
     };
 
-    getServiceList();
+    $scope.getCustomerList($scope.page_no);
+
+    // ****Search in customer list***//
+    var getPastSession = function() {
+        $.get(MY_CONSTANT.url + '/api/admin/showBookings/'+$cookieStore.get('obj1')+'/'+$cookieStore.get('obj')+'/'+0+'/'+0+'/VALET?isInProgress=true', function (data) {
+            completeList = data.data.bookingDetails;
+        });
+    };
+    getPastSession();
+
+    $scope.searchResults = function(start, end, page) {
+        if(searchArray.length!=completeList.length) {
+            var filteredArray = [];
+            $scope.pageLoaded = false;
+            $scope.searchPaging = true;
+            $scope.page_no = page;
+            $scope.value;
+            end = end>searchArray.length?searchArray.length:end;
+            $scope.total_pages = Math.ceil(searchArray.length/$scope.page_length);
+            createPageArray(0, $scope.total_pages);
+            for(var i=start;i<end;i++) {
+                filteredArray.push(searchArray[i]);
+            }
+            $scope.list = filteredArray;
+        }
+        else {
+            $scope.searchPaging = false;
+            $scope.pageLoaded = true;
+            $scope.getCustomerList(1);
+        }
+    };
+    // Search for data
+    $scope.$watch('search', function(value) {
+        $scope.page_no = 1;
+        searchArray = [];
+        var index = 0;
+        value = value.toLowerCase();
+        if(!completeList.length)
+            getPastSession();
+        else {
+            completeList.forEach(function(column) {
+                var found = column.orderId==value || column.orderCreatedTime.search(value)>-1|| column.currentType.toLowerCase().search(value)>-1 ||  column.paymentDetails.status.toLowerCase().search(value)>-1|| column.orderStatus.toLowerCase().search(value)>-1;
+                found = found || column.pickUpLocationName.toLowerCase().search(value)>-1 || column.serviceType.toLowerCase().search(value)>-1|| column. orderCreatedTime.toLowerCase().search(value)>-1|| column.pickUpLocationName.toLowerCase().search(value)>-1;
+                if(found)
+                    putData(column, searchArray, ++index);
+            });
+            $scope.searchResults(0, $scope.page_length, $scope.page_no);
+        }
+    });
+    //****************************//
     //console.log('jdklajdkl');
     // Cancel Dialog
     $scope.cancelSession = function (userid) {
@@ -143,272 +207,74 @@ App.controller('OngoingSessionController', function ($scope, $http, $location, $
 })
 
 
-myApp.directive('map',function(markersCoords)
-{
 
+    App.controller('PastSessionController', function ($scope, $http, $location, $cookies, $cookieStore, MY_CONSTANT, $timeout, $window, ngDialog) {
+        'use strict';
+        $scope.loading = true;
+        $scope.pageLoaded = false;
+        $scope.searchPaging = false;
+        $scope.total_pages;
+        $scope.last_page;
+        $scope.page_no = 1;
+        $scope.total_records;
 
-    return {
-        restrict: 'E',
-        template: '<div id="mapSize" style="height: 500px;width: 100%"></div>',
-        link: function (scope){
-            var mapProp;
-            //var coordinates=new google.maps.LatLng(d.Lat, d.Lng);
-            //console.log(coordinates);
-            var chd= new google.maps.LatLng(30.7500 , 76.7800);
-            mapProp ={
-                center:chd,
-                zoom: 2,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            var map=new google.maps.Map(document.getElementById("mapSize"), mapProp);
-            /*var marker=new google.maps.Marker({
-             position: coordinates,
-             });*/
-            var createMarkers = function(map) {
-                console.log(markersCoords);
-                markersCoords.forEach(function(column){
-                    var marker = new google.maps.Marker({
-                        map: map,
-                        position: new google.maps.LatLng(column.Lat,column.Lng)
-                    });
-                });
-            };
-            scope.$watch(function(){return markersCoords;},function(value){
-                createMarkers(map);
-                console.log(value);
-            },true);
-            ///marker.setMap(map);
-        },
-        replace: true
-    }
-});
+        $scope.options = [10,25,50,100];
+        $scope.page_length = $scope.options[0];
 
-App.controller('UpcomingSessionController', function ($scope, $http, $location, $cookies, $cookieStore, MY_CONSTANT, $timeout, $window, ngDialog, getCategories) {
-    'use strict';
-    $scope.loading = true;
+        var start, end, searchArray;
+        var completeList = [];
 
-    var getServiceList = function () {
-        $.post(MY_CONSTANT.url + '/upcoming_booking', {
-            access_token: $cookieStore.get('obj').accesstoken
-
-        }, function (data) {
-            var dataArray = [];
-            data = JSON.parse(data);
-            data = data.bookings;
-            ////console.log(data);
-            if (data.error) {
-                ngDialog.open({
-                    template: '<p>Something went wrong !</p>',
-                    className: 'ngdialog-theme-default',
-                    plain: true,
-                    showClose: false,
-                    closeByDocument: false,
-                    closeByEscape: false
-                });
-                return false;
-            }
-            data.forEach(function (column) {
-             // console.log(column);
+        var putData = function(column, dataArray, index) {
                 var d = {
-                    id: "",
-                    booking_id: "",
-                    service_id: "",
-                    technician_id: "",
-                    address: "",
-                    customer_name: "",
-                    artist_name: "",
-                    booking_date:"",
-                    service_date: "",
-                    start_time: "",
-                    status: "",
-                    cost: "",
-                    category: "",
-                    service_name: "",
-                    city_techs: "",
-                    assigned_to:""
+                    index : "",
+                    orderId: "",
+                    serviceType: "",
+                    currentType: "",
+                    jobStatus: "",
+                    payment: "",
+                    orderCreatedTime: "",
+                    pickuplocationname: ""
+                    //dropsoffspid:"",
+                    //Lat: "",
+                    //Lng: "",
+                    // fullName: "",
                 };
-                //console.log(column.categories);
-                //var book_date = column.booking_date.toString().split("T")[0];
-                  var booking_ids = column.booking_id;
-                $scope.city_teks = [];
-                var getTechList = function () {
-                    $.post(MY_CONSTANT.url + '/assign_list', {
-                        booking_id: booking_ids
-                    },
-                    function (data) {
-                        //data = data.service_codes;
-                        //console.log(data);
-
-                        data = JSON.parse(data);
-                        //$scope.city_teks=data;
-                        // for (var i=0; i < data.length;i++)
-                        // {
-                        //    console.log(data.length);
-                        //     $scope.city_teks[i]=data[i];
-
-
-                        // }
-
-                        console.log('data artist');
-                        console.log(data);
-                        d.city_techs = data;//$scope.city_teks;
-                });
-                };
-
-            getTechList();
-
-                var date = column.service_date.toString().split("T")[0];
-                var startTimeHours = column.start_time.split(":")[0];
-                var startTimeMinutes = column.start_time.split(":")[1];
-                var suffix = startTimeHours >= 12 ? "PM" : "AM",
-                    hours12 = startTimeHours % 12;
-                var displayTime = hours12 + ":" + startTimeMinutes + " " + suffix;
-                d.id = column.id;
-                d.booking_id = column.booking_id;
-                d.service_id = column.service_id;
-                d.technician_id = column.technician_id;
-                d.address = column.address;
-                d.customer_name = column.customer_name;
-                d.artist_name = column.artist_name;
-                d.start_time = displayTime;
-                d.cost = column.cost;
-                d.category = getCategories.getListFormat(column.categories);
-                d.booking_date = column.booking_date;
-                d.assigned_to = column.assigned_to;
-                d.service_date = date;
-                d.status = column.status;
-                d.service_name = getCategories.getListFormat(column.treatments);
+            d.index = index;
+                d.orderId = column.orderId;
+                d.serviceType = column.serviceType;
+                d.currentType = column.currentType;
+            d.jobStatus = column.orderStatus?column.orderStatus:'';
+                d.payment = column.paymentDetails.status;
+            d.orderCreatedTime = column.orderCreatedTime.split("T")[0];
+            d.serviceCost=column.paymentDetails.totalServiceCost;
+                d.pickUpLocationName = column.pickUpLocationName;
+                //markr.Lat=column.Lat;
+                //markr.Lng=column.Lng;
                 dataArray.push(d);
 
-            });
+        };
 
-            $scope.$apply(function () {
-                $scope.list = dataArray;
-                console.log(dataArray);
-
-
-                // Define global instance we'll use to destroy later
-                var dtInstance;
-                $scope.loading = false;
-                $timeout(function () {
-                    if (!$.fn.dataTable)
-                        return;
-                    dtInstance = $('#datatable2').dataTable({
-                        'paging': true, // Table pagination
-                        'ordering': true, // Column ordering
-                        'info': true, // Bottom left status text
-                        'bDestroy': true,
-                        // Text translation options
-                        // Note the required keywords between underscores (e.g _MENU_)
-                        oLanguage: {
-                            sSearch: 'Search all columns:',
-                            sLengthMenu: '_MENU_ records per page',
-                            info: 'Showing page _PAGE_ of _PAGES_',
-                            zeroRecords: 'Nothing found - sorry',
-                            infoEmpty: 'No records available',
-                            infoFiltered: '(filtered from _MAX_ total records)'
-                        }
-                    });
-                    var inputSearchClass = 'datatable_input_col_search';
-                    var columnInputs = $('tfoot .' + inputSearchClass);
-
-                    // On input keyup trigger filtering
-                    columnInputs
-                        .keyup(function () {
-                            dtInstance.fnFilter(this.value, columnInputs.index(this));
-                        });
-                });
-
-                // When scope is destroyed we unload all DT instances
-                // Also ColVis requires special attention since it attaches
-                // elements to body and will not be removed after unload DT
-                $scope.$on('$destroy', function () {
-                    dtInstance.fnDestroy();
-                    $('[class*=ColVis]').remove();
-                });
-            });
-
-        });
-    };
-
-    getServiceList();
-
-    // Change Status Dialog
-    $scope.assignArtist = function (bookingId, artistId) {
-        $scope.artistId = artistId;
-        $scope.bookingId = bookingId;
-        $scope.value = true;
-        $scope.addTeam = {};
-        ngDialog.open({
-            template: 'app/views/assign-dialog.html',
-            className: 'ngdialog-theme-default',
-            scope: $scope
-        });
-    };
-
-    $scope.assign = function () {
-
-        $.post(MY_CONSTANT.url + '/assign_new_artist',
-            {
-
-
-                access_token: $cookieStore.get('obj').accesstoken,
-                booking_id: $scope.bookingId,
-                artist_id: $scope.artistId
-            },
-            function (data) {
-                ////console.log(data);
-                $window.location.reload();
-
-            });
-    };
-
-    // Cancel Dialog
-    $scope.cancelSession = function (userid) {
-        $scope.dele_val = userid;
-        $scope.value = true;
-        $scope.addTeam = {};
-        ngDialog.open({
-            template: 'app/views/cancel-dialog.html',
-            className: 'ngdialog-theme-default',
-            scope: $scope
-        });
-    };
-
-    $scope.cancel = function () {
-
-        $.post(MY_CONSTANT.url + '/admin_cancel_booking',
-            {
-                access_token: $cookieStore.get('obj').accesstoken,
-                booking_id: $scope.dele_val
-            },
-            function (data) {
-                $window.location.reload();
-
-            });
-
-    };
-
-});
-App.value('markersCoords',[]);
-App.controller('PastSessionController', function ($scope, $http, $location, $cookies, $cookieStore, MY_CONSTANT, $timeout, ngDialog, $window, convertdatetime, getCategories, markersCoords) {
-    'use strict';
-    $scope.loading = true;
-    console.log('past');
-    var getServiceList = function () {
-        var accessToken=$cookieStore.get('obj');
-        console.log(accessToken);
-        var  adminId= $cookieStore.get('obj1');
-        console.log(adminId);
-        $.get(MY_CONSTANT.url + '/api/admin/showBookings/'+adminId+'/'+accessToken+'/'+0+'/'+0+'/VALET',
-            //access_token: $cookieStore.get('obj').accesstoken
-
-            function (data) {
-                console.log(data);
+        var createPageArray = function(start, end) {
+            var page_arr = [];
+            start = start<2?2:start;
+            end = end>$scope.total_pages-1?$scope.total_pages-1:end;
+            for(var i=start;i<=end;i++) {
+                page_arr.push(i);
+            }
+            $scope.pages = page_arr;
+        };
+        $scope.getCustomerList=function (page_number) {
+            $scope.last_page = $scope.page_no;
+            $scope.page_no = page_number;
+            $scope.limit=$scope.page_length;
+            $scope.skip = $scope.limit * ($scope.page_no-1);
+            //$scope.skip = $scope.page_no == $scope.total_pages?$scope.total_records-1:$scope.skip;
+            console.log($scope.skip);
+            var index = (page_number - 1) * $scope.page_length;
+            $.get(MY_CONSTANT.url + '/api/admin/showBookings/'+$cookieStore.get('obj1')+'/'+$cookieStore.get('obj')+'/'+$scope.skip+'/'+$scope.limit+'/VALET?orderStatus=COMPLETED', function (data) {
                 var dataArray = [];
-                console.log(data);
+                $scope.total_records = data.data.bookingsCount;
                 if (data.error) {
-                    console.log(data);
                     ngDialog.open({
                         template: '<p>Something went wrong !</p>',
                         className: 'ngdialog-theme-default',
@@ -419,95 +285,95 @@ App.controller('PastSessionController', function ($scope, $http, $location, $coo
                     });
                     return false;
                 }
+                $scope.total_pages = Math.ceil(data.data.bookingsCount/$scope.page_length);
                 data.data.bookingDetails.forEach(function (column) {
-
-                    var d = {
-                        orderid: "",
-                        servicetype: "",
-                        currenttype: "",
-                        jobstatus: "",
-                        payment:"",
-                        ordercreatedtime:"",
-                        pickuplocationname:"",
-                        dropsoffspid:"",
-                        Lat: "",
-                        Lng:"",
-                        fullName: "",
-                        // pikupspid: "",
-                        // serviceStartTime:''
-
-                    };
-                    var markr = {};
-                    //var book_date = column.booking_date.toString().split("T"[0]);
-                    //    var date = column.service_date.toString().split("T")[0];
-                    // var date='';
-                    //  var startTimeHours = column.start_time.split(":")[0];
-                    /// var startTimeMinutes = column.start_time.split(":")[1];
-                    // var suffix = startTimeHours >= 12 ? "PM" : "AM",
-                    //    hours12 = startTimeHours % 12;
-                    // var displayTime = hours12 + ":" + startTimeMinutes + " " + suffix;
-
-                     {  d.orderId = column.orderId;
-                         d.serviceType = column.serviceType;
-                         d.currentType= column.currentType;
-                         d.jobStatus = column.jobStatus;
-                         d.payment = column.paymentDetails.status;
-                         d.orderCreatedTime = column.orderCreatedTime;
-                         markr.Lat=column.Lat;
-                         markr.Lng=column.Lng;
-                         dataArray.push(d);
-                         markersCoords.push(markr);
-                     }
+                    putData(column, dataArray, ++index);
 
                 });
+                $scope.loading=false;
 
-                console.log(dataArray);
-                console.log(markersCoords);
                 $scope.$apply(function () {
                     $scope.list = dataArray;
-                    // console.log($scope.list);
-                    // Define global instance we'll use to destroy later
-                    var dtInstance;
                     $scope.loading = false;
-                    $timeout(function () {
-                        if (!$.fn.dataTable)
-                            return;
-                        dtInstance = $('#datatable2').dataTable({
-                            'paging': true, // Table pagination
-                            'ordering': true, // Column ordering
-                            'info': true, // Bottom left status text
-                            'bDestroy': true,
-                            // Text translation options
-                            // Note the required keywords between underscores (e.g _MENU_)
-                            oLanguage: {
-                                sSearch: 'Search all columns:',
-                                sLengthMenu: '_MENU_ records per page',
-                                info: 'Showing page _PAGE_ of _PAGES_',
-                                zeroRecords: 'Nothing found - sorry',
-                                infoEmpty: 'No records available',
-                                infoFiltered: '(filtered from _MAX_ total records)'
+                    if($scope.total_pages>7) {
+                        if($scope.page_no == 1) {
+                            start = 2;
+                            end = $scope.total_pages>6?5:$scope.total_pages;
+                        }
+                        else {
+                            if($scope.page_no!=$scope.last_page) {
+                                if($scope.last_page < $scope.page_no) {
+                                    start = $scope.page_no - 1;
+                                    end = $scope.page_no + 2;
+                                }
+                                else {
+                                    start = $scope.page_no - 2;
+                                    end = $scope.page_no +1;
+                                }
                             }
-                        });
-                        var inputSearchClass = 'datatable_input_col_search';
-                        var columnInputs = $('tfoot .' + inputSearchClass);
-
-                        // On input keyup trigger filtering
-                        columnInputs
-                            .keyup(function () {
-                                dtInstance.fnFilter(this.value, columnInputs.index(this));
-                            });
-                    });
-                    $scope.$on('$destroy', function () {
-                        dtInstance.fnDestroy();
-                        $('[class*=ColVis]').remove();
-                    });
+                        }
+                    }
+                    else {
+                        start = 2;
+                        end = $scope.total_pages;
+                    }
+                    createPageArray(start, end);
+                    $scope.searchPaging = false;
+                    $scope.pageLoaded = true;
                 });
-
             });
-    };
+        };
 
-    getServiceList();
-    console.log('jdklajdkl');
+        $scope.getCustomerList($scope.page_no);
+
+        // ****Search in customer list***//
+        var getPastSession = function() {
+            $.get(MY_CONSTANT.url + '/api/admin/showBookings/'+$cookieStore.get('obj1')+'/'+$cookieStore.get('obj')+'/'+0+'/'+0+'/VALET?orderStatus=COMPLETED', function (data) {
+                completeList = data.data.bookingDetails;
+            });
+        };
+        getPastSession();
+
+        $scope.searchResults = function(start, end, page) {
+            if(searchArray.length!=completeList.length) {
+                var filteredArray = [];
+                $scope.pageLoaded = false;
+                $scope.searchPaging = true;
+                $scope.page_no = page;
+                end = end>searchArray.length?searchArray.length:end;
+                $scope.total_pages = Math.ceil(searchArray.length/$scope.page_length);
+                createPageArray(0, $scope.total_pages);
+                for(var i=start;i<end;i++) {
+                    filteredArray.push(searchArray[i]);
+                }
+                $scope.list = filteredArray;
+            }
+            else {
+                $scope.searchPaging = false;
+                $scope.pageLoaded = true;
+                $scope.getCustomerList(1);
+            }
+        };
+        // Search for data
+        $scope.$watch('search', function(value) {
+            $scope.page_no = 1;
+            searchArray = [];
+            var index = 0;
+            value = value.toLowerCase();
+            if(!completeList.length)
+                getCustomers();
+            else {
+                completeList.forEach(function(column) {
+                    var found = column.orderId==value || column.orderCreatedTime.search(value)>-1|| column.currentType.toLowerCase().search(value)>-1 ||  column.paymentDetails.status.toLowerCase().search(value)>-1|| column.orderStatus.toLowerCase().search(value)>-1;
+                    found = found || column.pickUpLocationName.toLowerCase().search(value)>-1 || column.serviceType.toLowerCase().search(value)>-1|| column. orderCreatedTime.toLowerCase().search(value)>-1|| column.pickUpLocationName.toLowerCase().search(value)>-1;
+                    if(found)
+                        putData(column, searchArray, ++index);
+                });
+                $scope.searchResults(0, $scope.page_length, $scope.page_no);
+            }
+        });
+        //****************************//
+    //console.log('jdklajdkl');
     // Cancel Dialog
     $scope.cancelSession = function (userid) {
         $scope.dele_val = userid;
@@ -537,42 +403,42 @@ App.controller('PastSessionController', function ($scope, $http, $location, $coo
 })
 
 
-myApp.directive('map',function(markersCoords)
-{
-
-
-    return {
-        restrict: 'E',
-        template: '<div id="mapSize" style="height: 500px;width: 100%"></div>',
-        link: function (scope){
-            var mapProp;
-            //var coordinates=new google.maps.LatLng(d.Lat, d.Lng);
-            //console.log(coordinates);
-            var chd= new google.maps.LatLng(30.7500 , 76.7800);
-            mapProp ={
-                center:chd,
-                zoom: 2,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            var map=new google.maps.Map(document.getElementById("mapSize"), mapProp);
-            /*var marker=new google.maps.Marker({
-                position: coordinates,
-            });*/
-            var createMarkers = function(map) {
-                console.log(markersCoords);
-                markersCoords.forEach(function(column){
-                    var marker = new google.maps.Marker({
-                        map: map,
-                        position: new google.maps.LatLng(column.Lat,column.Lng)
-                    });
-                });
-            };
-            scope.$watch(function(){return markersCoords;},function(value){
-                createMarkers(map);
-                console.log(value);
-            },true);
-            ///marker.setMap(map);
-        },
-        replace: true
-    }
-});
+//myApp.directive('map',function(markersCoords)
+//{
+//
+//
+//    return {
+//        restrict: 'E',
+//        template: '<div id="mapSize" style="height: 500px;width: 100%"></div>',
+//        link: function (scope){
+//            var mapProp;
+//            //var coordinates=new google.maps.LatLng(d.Lat, d.Lng);
+//            //console.log(coordinates);
+//            var chd= new google.maps.LatLng(30.7500 , 76.7800);
+//            mapProp ={
+//                center:chd,
+//                zoom: 2,
+//                mapTypeId: google.maps.MapTypeId.ROADMAP
+//            };
+//            var map=new google.maps.Map(document.getElementById("mapSize"), mapProp);
+//            /*var marker=new google.maps.Marker({
+//                position: coordinates,
+//            });*/
+//            var createMarkers = function(map) {
+//                console.log(markersCoords);
+//                markersCoords.forEach(function(column){
+//                    var marker = new google.maps.Marker({
+//                        map: map,
+//                        position: new google.maps.LatLng(column.Lat,column.Lng)
+//                    });
+//                });
+//            };
+//            scope.$watch(function(){return markersCoords;},function(value){
+//                createMarkers(map);
+//                console.log(value);
+//            },true);
+//            ///marker.setMap(map);
+//        },
+//        replace: true
+//    }
+//});

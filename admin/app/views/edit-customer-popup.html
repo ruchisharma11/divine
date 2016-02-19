@@ -7,30 +7,27 @@
             <div ng-show="successMsg" class="alert alert-success text-center">{{successMsg}}</div>
             <div ng-show="errorMsg" class="alert alert-danger text-center">{{errorMsg}}</div>
             <div class="panel-body">
+
+
                 <div class="form-group">
-                    <label class="control-label">First name</label>
+                    <label class="control-label">First Name</label>
                     <input type="text" name="team_name" required="required" class="form-control"
                            ng-model="editCustomer.firstName"/>
                 </div>
                 <div class="form-group">
-                    <label class="control-label">Last name</label>
+                    <label class="control-label">Last Name</label>
                     <input type="text" name="team_name" required="required" class="form-control"
                            ng-model="editCustomer.lastName"/>
                 </div>
                 <div class="form-group">
-                    <label class="control-label">Phone no.</label>
-                    <input type="text" name="team_name" required="required" class="form-control"
-                           ng-model="editCustomer.phoneNumber" data-parsley-type="number"/>
+                    <label class="control-label">Phone No.</label>
+                    <input type="text" name="team_name" required="required" class="form-control" masked=""
+                           ng-model="editCustomer.phoneNumber"  data-inputmask="'mask':'99999-9999-9999'"/>
                 </div>
                 <div class="form-group">
-                    <label class="control-label">Email id</label>
+                    <label class="control-label">Email ID</label>
                     <input type="text" name="team_name" required="required" class="form-control"
                            ng-model="editCustomer.email"/>
-                </div>
-                <div class="form-group">
-                    <label class="control-label">Registration Date</label>
-                    <input type="text" name="team_name" required="required" class="form-control"
-                           ng-model="editCustomer.registrationDate"/>
                 </div>
 
 

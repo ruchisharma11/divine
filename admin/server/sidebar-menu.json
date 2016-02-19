@@ -19,11 +19,16 @@
     "sref": "#",
     "icon": "icon-user-following",
     "submenu": [
+      {
+        "text": "Add New Driver",
+        "sref": "app.add_artist"
+      },
 
       {
         "text": "Verified",
         "sref": "app.verified-artist"
       }
+
     ]
   },
 

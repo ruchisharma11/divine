@@ -262,7 +262,7 @@ td {
 }
 
 .panel-body {
-    overflow: auto;
+    /*overflow: auto;*/
 }
 
 /* Add Menu */

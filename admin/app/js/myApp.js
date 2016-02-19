@@ -4,18 +4,9 @@ myApp.run(["$log", function ($log) {
 }]);
 
 App.constant("MY_CONSTANT", {
-    //"url": "http://52.6.133.251:2600", dev
-   // "url": "http://52.6.133.251:2600", //live
-    "url": "http://52.6.32.171:8888",
-    //"CATEGORY1": "Blow Dry",
-    //"CATEGORY2": "Makeup",
-    //"CATEGORY3": "Manicure",
-    //"CATEGORY4": "All",
-    //"CATEGORY5": "Blow-Dry",
-    //"CATEGORY6": "Make-up",
-    //"CATEGORY7": "Manicure",
-    //"CATEGORY8": "Gel Manicure",
-    //"CATEGORY9": "Blow-Dry + Makeup"
+    "url": "http://divine.clicklabs.in:8888",
+    "url1":"http://divine.clicklabs.in:8080",
+
 });
 
 App.constant("responseCode", {
@@ -25,11 +16,6 @@ myApp.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'Rout
     function ($stateProvider, $locationProvider, $urlRouterProvider, helper) {
         'use strict';
 
-        //window.Stripe.setPublishableKey('pk_live_uG7GJhnmlrxyvrM5HnBRMAmw');
-        //pk_test_rqQYt1cmUkEZKFIuHS4ji2ec  live_uG7GJhnmlrxyvrM5HnBRMAmw
-
-        // Set the following to true to enable the HTML5 Mode
-        // You may have to set <base> tag in index and a routing configuration in your server
         $locationProvider.html5Mode(false);
 
         // default route
@@ -55,11 +41,7 @@ myApp.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'Rout
                 title: "Login",
                 templateUrl: 'app/pages/login.html'
             })
-            .state('page.register', {
-                url: '/register',
-                title: "Register",
-                templateUrl: 'app/pages/register.html'
-            })
+
             .state('page.recover', {
                 url: '/recover',
                 title: "Recover",
@@ -90,29 +72,29 @@ myApp.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'Rout
                 templateUrl: helper.basepath('notification-list.html'),
                 resolve: helper.resolveFor('datatables', 'datatables-pugins')
             })
-            .state('app.dashboard', {
-                url: '/dashboard',
-                title: 'Dashboard',
-                templateUrl: helper.basepath('dashboard.html'),
-                resolve: helper.resolveFor('flot-chart', 'flot-chart-plugins', 'datatables', 'datatables-pugins')
-            })
+            //.state('app.dashboard', {
+            //    url: '/dashboard',
+            //    title: 'Dashboard',
+            //    templateUrl: helper.basepath('dashboard.html'),
+            //    resolve: helper.resolveFor('flot-chart', 'flot-chart-plugins', 'datatables', 'datatables-pugins')
+            //})
             .state('app.dashboard-new', {
                 url: '/dashboard-new',
                 title: 'Dashboard New',
                 templateUrl: helper.basepath('dashboard-new.html'),
                 resolve: helper.resolveFor('flot-chart', 'flot-chart-plugins', 'datatables', 'datatables-pugins')
             })
-            .state('app.scheduler', {
-                url: '/scheduler',
-                title: 'Scheduler',
-                templateUrl: helper.basepath('scheduler.html'),
-                resolve: helper.resolveFor('flot-chart', 'flot-chart-plugins', 'datatables', 'datatables-pugins')
-            })
+            //.state('app.scheduler', {
+            //    url: '/scheduler',
+            //    title: 'Scheduler',
+            //    templateUrl: helper.basepath('scheduler.html'),
+            //    resolve: helper.resolveFor('flot-chart', 'flot-chart-plugins', 'datatables', 'datatables-pugins')
+            //})
             .state('app.customers', {
                 url: '/customers',
                 title: 'Customer Information',
                 templateUrl: helper.basepath('customer_list.html'),
-                resolve: helper.resolveFor('datatables', 'datatables-pugins')
+                resolve: helper.resolveFor('datatables', 'datatables-pugins', 'inputmask')
             })
             .state('app.customerInfo', {
                 url: "/customerinfo/{id:[0-9]*}",
@@ -126,24 +108,19 @@ myApp.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'Rout
                 templateUrl: helper.basepath('verified_artist.html'),
                 resolve: helper.resolveFor('datatables', 'datatables-pugins', 'ui.select', 'taginput', 'inputmask', 'moment', 'localytics.directives', 'slider','parsley')
             })
-            .state('app.artistInfo', {
-                url: "/artistinfo/{id:[0-9]*}",
-                title: 'Artist Details',
-                templateUrl: helper.basepath('artist-info.html'),
-                resolve: helper.resolveFor('datatables', 'datatables-pugins')
-            })
-            .state('app.requested-artist', {
-                url: '/requested-artist',
+
+            .state('app.add_artist', {
+                url: '/add_artist',
                 title: 'New Requested Artists',
-                templateUrl: helper.basepath('new_requested_artist.html'),
+                templateUrl: helper.basepath('add_artist.html'),
                 resolve: helper.resolveFor('datatables', 'datatables-pugins')
             })
-            .state('app.addsession', {
-                url: '/add-session',
-                title: 'Add Manual Session',
-                templateUrl: helper.basepath('add_session.html'),
-                resolve: helper.resolveFor('parsley', 'inputmask', 'ui.select')
-            })
+            //.state('app.addsession', {
+            //    url: '/add-session',
+            //    title: 'Add Manual Session',
+            //    templateUrl: helper.basepath('add_session.html'),
+            //    resolve: helper.resolveFor('parsley', 'inputmask', 'ui.select')
+            //})
             .state('app.ongoing', {
                 url: '/in-progress',
                 title: 'In progress Session',
@@ -162,106 +139,7 @@ myApp.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'Rout
                 templateUrl: helper.basepath('past.html'),
                 resolve: helper.resolveFor('datatables', 'datatables-pugins')
             })
-            .state('app.cancelled', {
-                url: '/cancelled',
-                title: 'Cancelled Session',
-                templateUrl: helper.basepath('cancelled.html'),
-                resolve: helper.resolveFor('datatables', 'datatables-pugins')
-            })
-            .state('app.service', {
-                url: '/service',
-                title: 'Services Information',
-                templateUrl: helper.basepath('service.html'),
-                resolve: helper.resolveFor('datatables', 'datatables-pugins', 'ngWig', 'parsley', 'ui.select')
-            })
-            .state('app.looks', {
-                url: '/looks',
-                title: 'Look Services Information Andriod',
-                templateUrl: helper.basepath('looks.html'),
-                resolve: helper.resolveFor('datatables', 'datatables-pugins', 'ngWig', 'parsley', 'ui.select')
-            })
-            .state('app.looks_ios', {
-                url: '/looks_ios',
-                title: 'Look Services Information iOS',
-                templateUrl: helper.basepath('looks_ios.html'),
-                resolve: helper.resolveFor('datatables', 'datatables-pugins', 'ngWig', 'parsley', 'ui.select')
-            })
-            .state('app.driverdatabase', {
-                url: '/driverdatabase',
-                title: 'Driver Database',
-                templateUrl: helper.basepath('driver_database.html'),
-                resolve: helper.resolveFor('datatables', 'datatables-pugins')
-            })
-            .state('app.payment', {
-                url: '/payment',
-                title: 'Payment',
-                templateUrl: helper.basepath('payment.html'),
-                resolve: helper.resolveFor('datatables', 'datatables-pugins')
-            })
-            //.state('app.reports', {
-            //    url: '/reports',
-            //    title: 'Reports',
-            //    templateUrl: helper.basepath('reports.html')
-            //})
-            .state('app.paymentInfo', {
-                url: "/{id:[0-9]*}",
-                title: 'Payment Details',
-                templateUrl: helper.basepath('payment-info.html'),
-                resolve: helper.resolveFor('datatables', 'datatables-pugins')
-            })
-            .state('app.activepromo', {
-                url: '/promo',
-                title: 'Promo Codes',
-                templateUrl: helper.basepath('active_promo.html'),
-                resolve: helper.resolveFor('parsley', 'datatables', 'datatables-pugins')
-            })
-            .state('app.expiredpromo', {
-                url: '/expiredpromo',
-                title: 'Expired Promo',
-                templateUrl: helper.basepath('expired_promo.html'),
-                resolve: helper.resolveFor('parsley', 'datatables', 'datatables-pugins')
-            })
-            .state('app.sharedpromo', {
-                url: '/sharedpromo',
-                title: 'Shared Promo',
-                templateUrl: helper.basepath('shared_promo.html'),
-                resolve: helper.resolveFor('parsley', 'datatables', 'datatables-pugins')
-            })
-            .state('app.areas-unreachable', {
-                url: '/areas-unreachable',
-                title: 'Unreachable Service Areas',
-                templateUrl: helper.basepath('areas-unreachable.html'),
-                resolve: helper.resolveFor('datatables', 'datatables-pugins')
-            })
-            .state('app.faq', {
-                url: '/update-faq',
-                title: 'Update FAQ',
-                templateUrl: helper.basepath('faq.html'),
-                resolve: helper.resolveFor('datatables', 'datatables-pugins', 'ngWig')
-            })
-            .state('app.feedback', {
-                url: '/feedback',
-                title: 'Feedback',
-                templateUrl: helper.basepath('feedback.html'),
-                resolve: helper.resolveFor('datatables', 'datatables-pugins')
-            })
-            .state('app.artistfeedback', {
-                url: '/artistfeedback',
-                title: 'Artist Feedback',
-                templateUrl: helper.basepath('artist_feedback.html'),
-                resolve: helper.resolveFor('datatables', 'datatables-pugins')
-            })
-            .state('app.reports', {
-                url: '/reports',
-                title: 'Reports',
-                templateUrl: helper.basepath('reports.html')
-            })
-            .
-            state('app.test', {
-                url: '/test',
-                title: 'Test',
-                templateUrl: helper.basepath('test.html')
-            });
+
 
         /**=========================================================
          * Conversion of Date & Time Format common factory
@@ -384,67 +262,7 @@ myApp.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'Rout
                 }
             };
         });
-        /**=========================================================
-         * Categories Function
-         =========================================================*/
-        App.factory('getCategories', function (MY_CONSTANT) {
-            //var categoryArr = [];
-            return {
 
-                category: function (list) {
-                    var servicesArr = [];
-                    list.forEach(function (list_column) {
-                        servicesArr.push(list_column);
-                    });
-                    var services = servicesArr.toString();
-                    var service_list = services.replace(/,/g, " + ");
-                    return service_list;
-                },
-                service_category: function (list) {
-                    var servicesArr = [];
-                    var list_cat = list.toString().split(",");
-                    list_cat.forEach(function (list_column) {
-                        if (list_column == 1) {
-                            var category = MY_CONSTANT.CATEGORY1;
-                        } else if (list_column == 2) {
-                            category = MY_CONSTANT.CATEGORY2;
-                        } else if (list_column == 3) {
-                            category = MY_CONSTANT.CATEGORY3;
-                        } else if (list_column == 4) {
-                            category = MY_CONSTANT.CATEGORY4;
-                        } else if (list_column == 5) {
-                            category = MY_CONSTANT.CATEGORY5;
-                        } else if (list_column == 6) {
-                            category = MY_CONSTANT.CATEGORY6;
-                        } else if (list_column == 7) {
-                            category = MY_CONSTANT.CATEGORY7;
-                        } else if (list_column == 8) {
-                            category = MY_CONSTANT.CATEGORY8;
-                        } else if (list_column == 9) {
-                            category = MY_CONSTANT.CATEGORY9;
-                        }
-                        servicesArr.push(category);
-                    });
-                    var services = servicesArr.toString();
-                    var service_list = services.replace(/,/g, " + ");
-                    return service_list;
-                },
-                getListFormat: function (list) {
-                    var list_unstyled = list.toString();
-                    var list_styled = list_unstyled.replace(/,/g, " + ");
-                    return list_styled;
-                },
-                getCategoryListForEditArtist: function (list) {
-                    var categoryArr = [];
-                    console.log(list);
-                    for (var i = 0; i < list.length; i++) {
-                        categoryArr.push(list[i].value);
-                    }
-                    var list_category = categoryArr.toString();
-                    return list_category;
-                }
-            };
-        })
 
         /**=========================================================
          * Provides a simple demo for bootstrap datepicker

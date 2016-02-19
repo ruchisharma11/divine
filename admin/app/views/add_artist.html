@@ -1,0 +1,80 @@
+<span ng-controller="NewRequestedController">
+
+<div class="container-fluid">
+    <div class="ngdialog-message">
+        <h3 style="color: black">Add Driver</h3>
+
+        <form method="post" validate-form="" novalidate="" ng-submit="AddService()" id="add-service" >
+            <div class="panel panel-default">
+
+                <!--<div ng-show="successMsg" class="alert alert-success text-center">{{successMsg}}</div>-->
+                <!--<div ng-show="errorMsg" class="alert alert-danger text-center">{{errorMsg}}</div>-->
+                <div class="panel-body" >
+                    <div class="form-group">
+                        <label class="control-label">First Name</label>
+                        <input type="text" name="team_name" style="text-transform:capitalize" class="form-control"
+                               ng-model="addService.firstName"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Last Name</label>
+                        <input type="text" name="team_name" style="text-transform:capitalize" class="form-control"
+                               ng-model="addService.lastName"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Email Id</label>
+                        <input type="text" name="team_name"  class="form-control"
+                               ng-model="addService.email" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Phone No.</label>
+                        <input type="text" name="team_name"  class="form-control"
+                               ng-model="addService.phoneNumber" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">License No.</label>
+                        <input type="text" name="team_name"  class="form-control"
+                               ng-model="addService.licenseNumber"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Address</label>
+                        <input type="text" name="team_name" style="text-transform:capitalize" class="form-control"
+                               ng-model="addService.address"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">License Expiry Date</label>
+                     <!--   <input type="text" name="team_name" required="required" class="form-control"
+                               ng-model="addService.licenseExpiryDate" />-->
+                        <div class="row" >
+                            <div class="col-md-11 ">
+                        <input  type="text" datepicker-popup="{{format}}"
+                               is-open="opened"
+                               style="background-color: #fff;cursor: pointer;text-align:left; "
+                               min-date=minDate  datepicker-options="dateOptions"
+                               date-disabled="disabled(date, mode)" close-text="Close"
+                               class="form-control" ng-model="addService.licenseExpiryDate"  readonly/>
+                                </div>
+                            <div class="col-md-1">
+                         <span class="input-group-btn">
+                           <button data-autoscroll="true"  type="button" ng-click="open($event)" class="btn btn-default" autofocus>
+                               <em class="fa fa-calendar"></em>
+                           </button>
+                        </span>
+                            </div>
+                    </div>
+
+
+                    <!--<input type="hidden" ng-model="editArtist.id_pop" />-->
+                </div>
+                <div class="panel-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" ng-click="reset_fields()" class="btn btn-default">Cancel
+                    </button>
+                </div>
+            </div>
+
+    </div>
+        </form>
+
+</div>
+    </div>
+    </span>

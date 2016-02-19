@@ -1,21 +1,88 @@
-App.controller('CustomersController', function ($scope, $http, $location, $cookies, $cookieStore, MY_CONSTANT, $timeout, $window, ngDialog) {
+/**
+ * Created by ruchi1 on 12/8/2015.
+ */
+App.controller('CustomersController', function ($scope, $http, $location, $cookies, $cookieStore, MY_CONSTANT, $timeout, $state, $window, ngDialog) {
     'use strict';
     $scope.loading = true;
+    $scope.pageLoaded = false;
+    $scope.searchPaging = false;
+    $scope.total_pages;
+    $scope.last_page;
+    $scope.page_no = 1;
+    $scope.total_records;
 
-    var getCustomerList = function () {
-       // alert('wooo');
-       var accessToken=$cookieStore.get('obj');
-        //console.log(accessToken);
-      var  adminId= $cookieStore.get('obj1');
-       // console.log(adminId);
-        $.get(MY_CONSTANT.url + '/api/admin/showCustomer/'+adminId+'/'+accessToken+'/'+0+'/'+0).then(
 
-         function (data) {
-            //console.log(data);
-            // console.log(data.data.customerDetails[1].firstName);
+    $scope.options = [10, 25, 50, 100];
+    $scope.page_length = $scope.options[0];
+
+    var start, end, searchArray;
+    var completeList = [];
+    var index1 = 1;
+    var putData = function (column, dataArray, index) {
+        if (column.isDeleted == false) {
+
+            var d = {
+                index: "",
+                cust_id: "",
+                image: "",
+                first_name: "",
+                last_name: "",
+                phone_no: "",
+                email: "",
+                total_trips: "",
+
+                //gender: "",
+                reg_date: "",
+                is_block: "",
+                is_delete: "",
+                is_edit: ""
+            };
+
+            d.index = index;
+            //d.index = index1;
+            d.cust_id = column._id;
+            d.image = "http://divineapp.s3.amazonaws.com/customerImages/" + column.image;
+            d.first_name = column.firstName;
+            d.last_name = column.lastName;
+            d.phone_no = column.phoneNumber;
+            d.email = column.email;
+            d.total_trips = column.totalTrips;
+            //d.gender = column.gender;
+            d.reg_date = column.registrationDate;
+            if (column.isBlocked == false) {
+                d.is_block = 0;
+            }
+            else if (column.isBlocked == true) {
+                d.is_block = 1;
+            }
+            //d.is_block = column.isBlocked;
+            // d.is_delete=column.isDeleted;
+            d.is_edit = column.isEdited;
+
+            dataArray.push(d);
+            //index1++;
+        }
+    };
+
+    var createPageArray = function (start, end) {
+        var page_arr = [];
+        start = start < 2 ? 2 : start;
+        end = end > $scope.total_pages - 1 ? $scope.total_pages - 1 : end;
+        for (var i = start; i <= end; i++) {
+            page_arr.push(i);
+        }
+        $scope.pages = page_arr;
+    };
+    $scope.getCustomerList = function (page_number) {
+        $scope.last_page = $scope.page_no;
+        $scope.page_no = page_number;
+        $scope.limit = $scope.page_length;
+        $scope.skip = $scope.limit * ($scope.page_no - 1);
+        $scope.skip = $scope.page_no == $scope.total_pages ? $scope.total_records - 1 : $scope.skip;
+        var index = (page_number - 1) * $scope.page_length;
+        $.get(MY_CONSTANT.url + '/api/admin/showCustomer/' + $cookieStore.get('obj1') + '/' + $cookieStore.get('obj') + '/' + $scope.skip + '/' + $scope.limit, function (data) {
             var dataArray = [];
-            //data = JSON.parse(data);
-            //console.log(data);
+            $scope.total_records = data.data.customersCount;
             if (data.error) {
                 ngDialog.open({
                     template: '<p>Something went wrong !</p>',
@@ -27,111 +94,103 @@ App.controller('CustomersController', function ($scope, $http, $location, $cooki
                 });
                 return false;
             }
-
+            $scope.total_pages = Math.ceil(data.data.customersCount / $scope.page_length);
             data.data.customerDetails.forEach(function (column) {
-
-                var d = {
-                    cust_id: "",
-                    image:"",
-                    first_name: "",
-                    last_name: "",
-                    phone_no: "",
-                    email: "",
-                    total_trips:"",
-
-                    //gender: "",
-                    reg_date: "",
-                    is_block: "",
-                    is_delete:"",
-                    is_edit:""
-                };
-
-                d.cust_id = column._id;
-                d.image="http://divineapp.s3.amazonaws.com/customerImages/"+column.image;
-                d.first_name = column.firstName;
-                d.last_name = column.lastName;
-                d.phone_no = column.phoneNumber;
-                d.email = column.email;
-                d.total_trips= column.totalTrips;
-                //d.gender = column.gender;
-                d.reg_date = column.registrationDate;
-                if(column.isBlocked==false)
-                {
-                    d.is_block = 0;
+                if (!column.isDeleted) {
+                    putData(column, dataArray, ++index);
                 }
-                else if(column.isBlocked==true)
-                {
-                    d.is_block = 1;
-                }
-                //d.is_block = column.isBlocked;
-                if(column.isDeleted==false)
-                {
-                    d.is_deleted = 0;
-                }
-                else if(column.isDeleted==true)
-                {
-                    d.is_deleted= 1;
-                }
-               // d.is_delete=column.isDeleted;
-                d.is_edit=column.isEdited;
 
-                dataArray.push(d);
-             //console.log(d);
             });
 
+            $scope.loading = false;
             $scope.$apply(function () {
                 $scope.list = dataArray;
-
-                    //console.log(dataArray);
-                // Define global instance we'll use to destroy later
-                var dtInstance;
+                console.log($scope.list);
                 $scope.loading = false;
-                $timeout(function () {
-                    if (!$.fn.dataTable)
-                        return;
-                    dtInstance = $('#datatable2').dataTable({
-                        'paging': true, // Table pagination
-                        'ordering': true, // Column ordering
-                        'info': true, // Bottom left status text
-                        'bDestroy': true,
-                        // Text translation options
-                        // Note the required keywords between underscores (e.g _MENU_)
-                        oLanguage: {
-                            sLengthMenu: '_MENU_ records per page',
-                            sSearch: 'Search all columns:',
-                            info: 'Showing page _PAGE_ of _PAGES_',
-                            zeroRecords: 'Nothing found - sorry',
-                            infoEmpty: 'No records available',
-                            infoFiltered: '(filtered from _MAX_ total records)'
+                if ($scope.total_pages > 7) {
+                    if ($scope.page_no == 1) {
+                        start = 2;
+                        end = $scope.total_pages > 6 ? 5 : $scope.total_pages;
+                    }
+                    else {
+                        if ($scope.page_no != $scope.last_page) {
+                            if ($scope.last_page < $scope.page_no) {
+                                start = $scope.page_no - 1;
+                                end = $scope.page_no + 2;
+                            }
+                            else {
+                                start = $scope.page_no - 2;
+                                end = $scope.page_no + 1;
+                            }
                         }
-                    });
-                    var inputSearchClass = 'datatable_input_col_search';
-                    var columnInputs = $('tfoot .' + inputSearchClass);
-
-                    // On input keyup trigger filtering
-                    columnInputs
-                        .keyup(function () {
-                            dtInstance.fnFilter(this.value, columnInputs.index(this));
-                        });
-                });
-
-                // When scope is destroyed we unload all DT instances
-                // Also ColVis requires special attention since it attaches
-                // elements to body and will not be removed after unload DT
-                $scope.$on('$destroy', function () {
-                    dtInstance.fnDestroy();
-                    $('[class*=ColVis]').remove();
-                });
+                    }
+                }
+                else {
+                    start = 2;
+                    end = $scope.total_pages;
+                }
+                createPageArray(start, end);
+                $scope.searchPaging = false;
+                $scope.pageLoaded = true;
             });
-
         });
     };
 
-    getCustomerList();
+    $scope.getCustomerList($scope.page_no);
 
-    // Delete Dialog
+    // ****Search in customer list***//
+    var getCustomers = function () {
+        $.get(MY_CONSTANT.url + '/api/admin/showCustomer/' + $cookieStore.get('obj1') + '/' + $cookieStore.get('obj') + '/' + 0 + '/' + 0, function (data) {
+            completeList = data.data.customerDetails;
+        });
+    };
+    getCustomers();
+
+    $scope.searchResults = function (start, end, page) {
+        if (searchArray.length != completeList.length) {
+            var filteredArray = [];
+            $scope.pageLoaded = false;
+            $scope.searchPaging = true;
+            $scope.page_no = page;
+            end = end > searchArray.length ? searchArray.length : end;
+            $scope.total_pages = Math.ceil(searchArray.length / $scope.page_length);
+            createPageArray(0, $scope.total_pages);
+            for (var i = start; i < end; i++) {
+                filteredArray.push(searchArray[i]);
+            }
+            $scope.list = filteredArray;
+        }
+        else {
+            $scope.searchPaging = false;
+            $scope.pageLoaded = true;
+            $scope.getCustomerList();
+            //location.reload();
+        }
+    };
+    // Search for data
+    $scope.$watch('search', function (value) {
+        $scope.page_no = 1;
+        searchArray = [];
+        var index = 0;
+        if(!value) value='1';
+        value = value.toLowerCase();
+        if (!completeList.length)
+            getCustomers();
+        else {
+            completeList.forEach(function (column) {
+                var found = column._id.toLowerCase().search(value) > -1 || column.firstName.toLowerCase().search(value) > -1;
+                found = found || column.lastName.toLowerCase().search(value) > -1 || column.email.toLowerCase().search(value) > -1 || column.phoneNumber.search(value) > -1 || column.totalTrips <= parseInt(value);
+                if (found)
+                    putData(column, searchArray, ++index);
+            });
+            $scope.searchResults(0, $scope.page_length, $scope.page_no);
+        }
+    });
+
+// Delete Dialog========================================================================================================
     $scope.deleteCustomer = function (userid) {
         $scope.dele_val = userid;
+        // console.log(dele_val)
         $scope.value = true;
         $scope.addTeam = {};
         ngDialog.open({
@@ -141,23 +200,25 @@ App.controller('CustomersController', function ($scope, $http, $location, $cooki
         });
     };
 
-    $scope.delete = function (_id,isDeleted) {
-
+    $scope.delete = function () {
         $.ajax({
             type: 'PUT',
-            url: MY_CONSTANT.url + '/api/admin/deleteUser' ,
+            url: MY_CONSTANT.url + '/api/admin/deleteUser',
             //headers: {'authorization': 'bearer' + " " + $cookieStore.get('accessToken')},
-            data:
-            {
-                "adminId": "$cookieStore.get('obj1')",
-                "accessToken": "$cookieStore.get('obj')",
-                "userId": "_id",
+            data: {
+                "adminId": $cookieStore.get('obj1'),
+                "accessToken": $cookieStore.get('obj'),
+                "userId": $scope.dele_val,
                 "userType": "customer"
             },
             success: function (data) {
-                //console.log(data);
-                if (data.message=='Success') {
+                //console.log('abc',details);
+                //console.log('aaa', data.details);
+                if (data.details.code == 200) {
+                    alert('Data Updated')
                     $scope.$apply();
+                    ngDialog.close(0);
+                    $scope.getCustomerList(1);
                     $state.reload();
                 }
                 else
@@ -167,9 +228,10 @@ App.controller('CustomersController', function ($scope, $http, $location, $cooki
 
     };
 
-    // Change Status Dialog
+    // Change Status Dialog=============================================================================================
     $scope.changeStatus = function (status, userid) {
         $scope.user_val = userid;
+        //console.log($scope.user_val);
         if (status == 1) {
             $scope.stat = "block";
             $scope.stat_btn = "Block";
@@ -188,39 +250,66 @@ App.controller('CustomersController', function ($scope, $http, $location, $cooki
             scope: $scope
         });
     };
+    if ($scope.status == 1) {
+        $scope.change = function (user_val) {
+            //console.log("dfs");
+            //console.log(user_val);
+            var data = {
+                "adminId": $cookieStore.get('obj1'),
+                "accessToken": $cookieStore.get('obj'),
+                "userId": user_val,
+                "userType": "customer"
+            };
+            $.ajax({
+                method: 'PUT',
+                url: 'http://divine.clicklabs.in:8888/api/admin/blockUser',
+                dataType: 'json',
+                data: data,
+                success: function (data) {
+                    $window.location.reload();
+                }
 
-    $scope.change = function (user_val) {
-    console.log("dfs");
-        console.log(user_val);
-        var data = {
-            "adminId": $cookieStore.get('obj1'),
-            "accessToken": $cookieStore.get('obj'),
-            "userId": user_val,
-            "userType":"customer"
+
+            });
+
         };
-        $.ajax({
-            method: 'PUT',
-            url:'http://52.6.32.171:8888/api/admin/blockUser',
-            dataType: 'json',
-            data: data,
-            success: function(data){
-                $window.location.reload();
-            }
+    }
+    else {
+        $scope.change = function (user_val) {
+            //console.log("dfs");
+            //console.log(user_val);
+            var data = {
+                "adminId": $cookieStore.get('obj1'),
+                "accessToken": $cookieStore.get('obj'),
+                "userId": user_val,
+                "userType": "customer"
+            };
+            $.ajax({
+                method: 'PUT',
+                url: 'http://divine.clicklabs.in:8888/api/admin/unblockUser',
+                dataType: 'json',
+                data: data,
+                success: function (data) {
+                    $window.location.reload();
+                }
 
 
+            });
 
-        });
+        };
+    }
+    // change status ends here==========================================================================================
 
-    };
-    //..........................................edit customer
+
+    //.edit customer======================================================================================================
     $scope.editCustomer = {};
     $scope.Customer = function (json) {
 
 
-           console.log(json.cust_id);
+        //console.log(json.cust_id);
         $scope.editCustomer.id_pop = json.cust_id;
         //$scope.editService.category = [{value: json.category}];
-       // $scope.updateVal = json.category;
+        // $scope.updateVal = json.category;
         $scope.editCustomer.firstName = json.first_name;
         $scope.editCustomer.lastName = json.last_name;
         $scope.editCustomer.phoneNumber = json.phone_no;
@@ -236,31 +325,36 @@ App.controller('CustomersController', function ($scope, $http, $location, $cooki
             scope: $scope
         });
     };
+});
 
-
-App.controller('EditCustomerController', function ($scope, $http, $location, $cookies, $cookieStore, MY_CONSTANT, $window) {
+App.controller('EditCustomerController', function ($scope, $http, $location, $cookies, $cookieStore, MY_CONSTANT, $state, ngDialog) {
     'use strict';
 
     $scope.successMsg = '';
     $scope.errorMsg = '';
     $scope.addService = {};
-   // alert("dldk");ababdul.shamim@clicklabs.codul.shamim@clicklabs.co
+    // alert("dldk");ababdul.shamim@clicklabs.codul.shamim@clicklabs.co
 
     $scope.EditService = function (editCustomer) {
-
-
- console.log(editCustomer.id_pop,editCustomer.email,editCustomer.phoneNumber);
+        //console.log(editCustomer.phoneNumber);
+        var mobile = editCustomer.phoneNumber;
+        if(mobile[mobile.indexOf('_')-1]=='-') {
+            mobile = mobile.substr(0, mobile.indexOf('_') - 1);
+        }
+        if(mobile.search('_')>-1) {
+            mobile = mobile.substr(0, mobile.search('_'));
+        }
+        //console.log(editCustomer.id_pop, editCustomer.email, editCustomer.phoneNumber);
         $.ajax({
             type: 'PUT',
-            url: MY_CONSTANT.url + '/api/admin/editCustomerDetails' ,
+            url: MY_CONSTANT.url + '/api/admin/editCustomerDetails',
             //headers: {'authorization': 'bearer' + " " + $cookieStore.get('accessToken')},
-            data:
-            {
+            data: {
                 "adminId": $cookieStore.get('obj1'),
                 "accessToken": $cookieStore.get('obj'),
                 "userId": editCustomer.id_pop,
                 "email": editCustomer.email,
-                "phoneNumber": editCustomer.phoneNumber,
+                "phoneNumber": mobile,
                 "firstName": editCustomer.firstName,
                 "lastName": editCustomer.lastName,
                 "carDetails": [
@@ -269,74 +363,21 @@ App.controller('EditCustomerController', function ($scope, $http, $location, $co
 
             },
             success: function (data) {
-               console.log(data);
-                alert(data.details.message);
-                if (data.message=='Success') {
-                    $scope.$apply();
-                    $state.reload();
-                }
-
-            }
-        });
-    }
-});
-
-/*------------Edit Customer Info Section Starts---------------*/
-    $scope.pop = {};
-    $scope.editData = function () {
-        console.log("yes");
-        ngDialog.openConfirm({
-            template: 'modalDialogId',
-            className: 'ngdialog-theme-default',
-            scope: $scope
-        });
-        $scope.pop.callUs=$scope.callUs;
-        $scope.pop.emailUs=$scope.emailUs;
-        $scope.pop.website=$scope.website;
-        $scope.pop.facebookLink=$scope.facebookLink;
-        $scope.pop.twitterLink=$scope.twitterLink;
-    };    $scope.editCustomer = function(){
-        var data={
-            callUs: $scope.pop.callUs,
-            emailUs: $scope.pop.emailUs,
-            website: $scope.pop.website,
-            facebookLink: $scope.pop.facebookLink,
-            twitterLink: $scope.pop.twitterLink
-        };
-        $.ajax({
-            type: 'PUT',
-            url: MY_CONSTANT.url + '/api/admin/editCustomerDetails' ,
-            //headers: {'authorization': 'bearer' + " " + $cookieStore.get('accessToken')},
-            data:
-            {
-                "adminId": "$cookieStore.get('obj1')",
-                "accessToken": "$cookieStore.get('obj')",
-                "userId": "_id",
-                "email": "email",
-                "phoneNumber": "phoneNumber",
-                "firstName": "firstName",
-                "lastName": "lastName",
-                "carDetails": [
-                    null
-                ]
-
-            },
-            success: function (data) {
                 //console.log(data);
-                if (data.message=='Success') {
-                    $scope.$apply();
-                    $state.reload();
-                }
-                else
-                    alert("Error");
+                window.alert("Data Updated");
+                $scope.$apply();
+                ngDialog.close();
+                $state.reload();
             }
         });
-
     };
-
-
+//edit panel end===========================================================================================================================
 
 });
+
+
+//customer information=======================================================================================================================
+
 
 App.controller('CustomerInfoController', function ($scope, $http, $location, $cookies, $cookieStore, MY_CONSTANT, $timeout, ngDialog, $stateParams, convertdatetime, getCategories) {
     'use strict';
@@ -344,15 +385,16 @@ App.controller('CustomerInfoController', function ($scope, $http, $location, $co
     $scope.loading_image = true;
     $scope.customer = {};
     var userId = $stateParams.id;
-    var accessToken=$cookieStore.get('obj');
+    var accessToken = $cookieStore.get('obj');
     //console.log(accessToken);
-    var  adminId= $cookieStore.get('obj1');
+    var adminId = $cookieStore.get('obj1');
     // console.log(adminId);
-    $.get(MY_CONSTANT.url + '/api/admin/showCustomer/'+adminId+'/'+accessToken+'/'+0+'/'+0).then
-    ( function (data) {
-        var dataArray = [];
-       //data = JSON.parse(data);
 
+    $.get(MY_CONSTANT.url + '/api/admin/userDetails?adminId=' + adminId + '&accessToken=' + accessToken + '&userId=' + userId + '&userType=customer').then
+    (function (data) {
+        var dataArray = [];
+        //data = JSON.parse(data);
+      console.log(data.data.orders);
         if (data.error) {
             ngDialog.open({
                 template: '<p>Something went wrong !</p>',
@@ -364,93 +406,71 @@ App.controller('CustomerInfoController', function ($scope, $http, $location, $co
             });
             return false;
         }
-      //var customer_data = data.customerDetail[0];
+        $scope.loading = false;
+        $scope.loading_image = false;
+        if(data.data.orders.length>0){
+
+        //var customer_data = data.customerDetail[0];
         $scope.customer.image = data.data.baseUrl;
         $scope.customer.name = data.data.firstName;
         $scope.customer.email = data.data.email;
         $scope.customer.phone = data.data.phoneNumber;
+        //$scope.i = 0;
         //console.log(data);
-        data.data.customerDetails.forEach(function (column) {
+        //data.data.customerDetails.forEach(function (column) {
+            var dataArray=[];
+            var custorders=data.data.orders;
+            custorders.forEach(function(column){
+                var d = {};
+                //d.OrderId = data.data.orders?data.data.orders[0].orderId:'';
+                //d.orderCreatedTime = data.data.orders[0].orderCreatedTime;
+                //d.carDetails = data.data.orders[0].carDetails.colourCode+" "+data.data.orders[0].carDetails.make+" "+data.data.orders[0].carDetails.model;
+                //d.licensePlateNumber = data.data.orders[0].carDetails.licensePlateNumber;
+                d.OrderId = column.orderId?column.orderId:'';
+                d.orderCreatedTime = column.orderCreatedTime;
+                d.carDetails = column.carDetails.colourCode+" "+column.carDetails.make+" "+column.carDetails.model;
+                d.licensePlateNumber = column.carDetails.licensePlateNumber;
+                dataArray.push(d);
 
-            var d = {
+            });
+            $scope.list=dataArray;
 
-                Sno : "",
-               OrderId: "",
-                spId: "",
-               colourCode: "",
-                make: "",
-               model: "",
-               licensePlateNumber: "",
-               rating: ""
+        ////console.log(column);
+        //for (i = 0; i <= rating.length; i++) {
+        //    if (column.rating.length > 0) {
+        //        d.OrderId = column.rating[i].orderId;
+        //        d.date=column.rating[i].dateRated;
+        //    }
+        //    else {
+        //        d.OrderId = 'null';
+        //        d.date='null';
+        //
+        //    }
+        //}
+        //
+        //d.carDetails = column.carDetails[0].colourCode + column.carDetails[0].colourCode + column.carDetails[0].model;
+        //d.licensePlateNumber = column.carDetails[0].licensePlateNumber;
+        //d.rating = column.rating;
 
-            };
-            if(column._id==$stateParams.id)
-            { console.log(column);
-           // d.Sno = column.Sno;
-            d.OrderId = column.rating[0].orderId;
-            d.spId = column.rating[0].spId;
-            d.colourCode = column.carDetails[0].colourCode;
-            d.make = column.carDetails[0].make;
-            d.model = column.carDetails[0].model;
-            d.licensePlateNumber = column.carDetails[0].licensePlateNumber;
-            d.rating = column.rating;
-                $scope.customer.image += column.image;
-                $scope.customer.name = column.firstName+" "+column.lastName;
-                $scope.customer.email = column.email;
-                $scope.customer.phone = column.phoneNumber;
-                console.log($scope.customer.image);
+        $scope.customer.image = "http://divineapp.s3.amazonaws.com/customerImages/" + data.data.userDetails.image;
+        $scope.customer.name = data.data.userDetails.firstName + " " + data.data.userDetails.lastName;
+        $scope.customer.email = data.data.userDetails.email;
+        $scope.customer.phone = data.data.userDetails.phoneNumber;
+        //console.log($scope.customer.image);
 
 
-            dataArray.push(d);
-            console.log(d);
-            }
-            //break ;}
-        });
+        dataArray.push(d);
+        //console.log(d);
 
+        //break ;}
         $scope.$apply(function () {
             $scope.list = dataArray;
-            console.log(dataArray);
-            $scope.loading_image = false;
-
-
-            // Define global instance we'll use to destroy later
-            var dtInstance;
-            $scope.loading = false;
-            $timeout(function () {
-                if (!$.fn.dataTable) return;
-                dtInstance = $('#datatable2').dataTable({
-                    'paging': true,  // Table pagination
-                    'ordering': true,  // Column ordering
-                    'info': true,  // Bottom left status text
-                    // Text translation options
-                    // Note the required keywords between underscores (e.g _MENU_)
-                    oLanguage: {
-                        sSearch: 'Search all columns:',
-                        sLengthMenu: '_MENU_ records per page',
-                        info: 'Showing page _PAGE_ of _PAGES_',
-                        zeroRecords: 'Nothing found - sorry',
-                        infoEmpty: 'No records available',
-                        infoFiltered: '(filtered from _MAX_ total records)'
-                    }
-                });
-                var inputSearchClass = 'datatable_input_col_search';
-                var columnInputs = $('tfoot .' + inputSearchClass);
-
-                // On input keyup trigger filtering
-                columnInputs
-                            .keyup(function () {
-                        dtInstance.fnFilter(this.value, columnInputs.index(this));
-                    });
-            });
-
-            // When scope is destroyed we unload all DT instances
-            // Also ColVis requires special attention since it attaches
-            // elements to body and will not be removed after unload DT
-            $scope.$on('$destroy', function () {
-                dtInstance.fnDestroy();
-                $('[class*=ColVis]').remove();
-            });
-        });
+            //console.log(dataArray);
+            //$scope.loading_image = false;
+    });
+        //$scope.loading = false;
+            }
 
     });
+
 });

@@ -24,29 +24,10 @@
                     <input type="text" name="team_name" required="required" class="form-control" data-ui-mask="(99999) 999-999"
                            ng-model="editArtist.phone"  />
                 </div>
-                <!--data-parsley-type="number"-->
-                <!--<div class="form-group">-->
-                    <!--<label class="control-label">Gender</label>-->
 
-                    <!--<div class="controls clearfix">-->
-                        <!--<div class="radio c-radio gender">-->
-                            <!--<label>-->
-                                <!--<input type="radio" value="Male" name="gender" checked=""-->
-                                       <!--ng-model="editArtist.gender">-->
-                                <!--<span class="fa fa-circle"></span>Male</label>-->
-                        <!--</div>-->
-                        <!--<div class="radio c-radio gender">-->
-                            <!--<label>-->
-                                <!--<input type="radio" value="Female" name="gender"-->
-                                       <!--ng-model="editArtist.gender">-->
-                                <!--<span class="fa fa-circle"></span>Female</label>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                <!--</div>-->
                 <div class="form-group">
                     <label class="control-label">Experience</label>
-                    <!--<input type="text" name="team_name" required="required" class="form-control"-->
-                           <!--ng-model="editArtist.experience" placeholder="years"/>-->
+
                     <select name="type" class="form-control" ng-model="editArtist.experience" required="required">
                         <option ng-repeat="option in options_exp" ng-value="option.value"
                                 ng-selected="option.name == editArtist.experience">{{option.name}}
@@ -58,17 +39,6 @@
                     <input type="text" name="team_name" required="required" class="form-control"
                            ng-model="editArtist.qualification" placeholder="Qualification"/>
                 </div>
-
-     <!--           <div class="form-group">
-                        <ui-select multiple="" ng-model="multipleDemo.selectedPeople" theme="bootstrap" ng-disabled="disabled">
-                            <ui-select-match placeholder="Select person...">{{$item.name}} &lt;{{$item.email}}&gt;</ui-select-match>
-                            <ui-select-choices repeat="person in people | propsFilter: {name: $select.search, age: $select.search}">
-                                <div ng-bind-html="person.name | highlight: $select.search"></div>
-                            </ui-select-choices>
-                        </ui-select>
-                </div>-->
-
-
 
                 <div class="form-group">
                     <label class="control-label">Service Category</label>
@@ -82,11 +52,7 @@
                     <label class="control-label">Service City</label>
                     <input type="text" name="team_name" required="required" class="form-control" readonly=""
                            ng-model="editArtist.city" placeholder="Service City"/>
-                    <!--<ui-select multiple="" ng-model="editArtist.city" theme="bootstrap" ng-disabled="disabled">-->
-                        <!--<ui-select-match placeholder="Select Cities">{{$item.name}}</ui-select-match>-->
-                        <!--<ui-select-choices repeat="city in options_city | filter:$select.search">{{city.name}}-->
-                        <!--</ui-select-choices>-->
-                    <!--</ui-select>-->
+
                 </div>
                 <div class="form-group">
                     <label class="control-label">Summary</label>
